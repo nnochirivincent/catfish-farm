@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop Catfish - Victory Catfish Farm Lagos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+  <!-- ===== HEADER ===== -->
+  <header>
+    <div class="container header-container">
+      <a href="index.html" class="logo">
+        <span class="logo-icon">🐟</span>
+        <span class="logo-text">VICTORY FARM<br><small>Catfish Farm</small></span>
+      </a>
+      <nav class="navbar" id="navbar">
+        <a href="index.html">Home</a>
+        <a href="product.html" class="active">Shop</a>
+        <a href="index.html#about">About</a>
+        <a href="index.html#blog">Blog</a>
+        <a href="faq.html">FAQ</a>
+        <a href="contact.html">Contact</a>
+        <a href="cart.html">Cart (<span id="cart-count">0</span>)</a>
+      </nav>
+      <div class="header-actions">
+        <a href="https://wa.me/2348034732228" class="btn-whatsapp-small">💬 WhatsApp</a>
+        <button class="hamburger" id="hamburger">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== SHOP HERO ===== -->
+  <section class="shop-hero">
+    <div class="container">
+      <h1>Shop Fresh African Catfish</h1>
+      <p>From pond to plate in 4 hours. Same-day delivery across Lagos</p>
+      <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Search for Live, Smoked, Fingerlings...">
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FILTER BUTTONS ===== -->
+  <section class="container">
+    <div class="category-filter" id="categoryFilter">
+      <button class="filter-btn active" data-category="all">All Products</button>
+      <button class="filter-btn" data-category="Live & Fresh">Live & Fresh</button>
+      <button class="filter-btn" data-category="Smoked & Grilled">Smoked & Grilled</button>
+      <button class="filter-btn" data-category="Fingerlings & Juvenile">Fingerlings & Juvenile</button>
+    </div>
+  </section>
+
+  <!-- ===== PRODUCTS GRID ===== -->
+  <main class="container products">
+    <div class="product-grid" id="product-list">
+      <!-- Products will be loaded by JS -->
+    </div>
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <div class="footer-container">
+      <div class="footer-col">
+        <h4>🐟 Victory Catfish Farm</h4>
+        <p>#1 source for fresh, healthy, antibiotic-free African Catfish in Lagos.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="product.html">Shop</a></li>
+          <li><a href="cart.html">View Cart</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact Us</h4>
+        <ul class="contact-info">
+          <li>📍 Lagos, Nigeria</li>
+          <li>📞 WhatsApp: <a href="https://wa.me/2348034732228">080-3473-2228</a></li>
+          <li>🚚 Same-Day Delivery</li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 Victory Catfish Farm. All Rights Reserved.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+
+  <!-- FLOATING CHECKOUT BUTTON -->
+<a href="cart.html" id="floatingCheckoutBtn" style="display:none; position:fixed; bottom:20px; right:20px; background:#27ae60; color:white; padding:14px 22px; border-radius:50px; font-weight:bold; box-shadow:0 4px 12px rgba(0,0,0,0.2); z-index:999; text-decoration:none;">
+  🛒 Proceed to Checkout
+</a>
+
+</body>
+</html>

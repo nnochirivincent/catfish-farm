@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout - Victory Catfish Farm</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="container header-container">
+      <a href="index.html" class="logo">
+        <span class="logo-icon">🐟</span>
+        <span class="logo-text">VICTORY FARM<br><small>Catfish Farm</small></span>
+      </a>
+      <nav class="navbar">
+        <a href="index.html">Home</a>
+        <a href="products.html">Shop</a>
+        <a href="cart.html">Cart</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="contact-section container">
+    <h2>Checkout</h2>
+    <p class="subtitle">Complete your order and pay securely with Paystack</p>
+
+    <div class="contact-grid">
+      <!-- ORDER SUMMARY -->
+      <div class="contact-info">
+        <h3>Order Summary</h3>
+        <p>Items in cart: <b id="checkoutItemCount">0</b></p>
+        <p>Subtotal: <b id="checkoutSubtotal">₦0</b></p>
+        <p>Delivery to Lagos: <b>₦2,000</b></p>
+        <hr>
+        <p style="font-size:1.2rem;">Total to Pay: <b id="checkoutTotal">₦0</b></p>
+        <a href="cart.html" class="btn btn-outline btn-block">← Back to Cart</a>
+      </div>
+
+      <!-- CHECKOUT FORM -->
+      <div class="contact-form">
+        <h3>Customer Details</h3>
+        <form id="checkoutForm"> <!-- ID MATCHES script.js -->
+          <input type="text" id="customerName" placeholder="Full Name" required>
+          <input type="email" id="customerEmail" placeholder="Email Address" required>
+          <input type="tel" id="customerPhone" placeholder="Phone Number" required>
+          <select id="customerArea" required>
+            <option value="">Delivery Area - Lagos</option>
+            <option>Ikeja</option>
+            <option>Lekki</option>
+            <option>Yaba</option>
+            <option>Surulere</option>
+            <option>Ikorodu</option>
+            <option>Victoria Island</option>
+          </select>
+          <textarea id="customerAddress" rows="3" placeholder="Full Delivery Address" required></textarea>
+          <button type="submit" id="payNowBtn" class="btn btn-primary btn-large" style="background:#27ae60; width:100%;">🔒 Pay with Paystack</button>
+        </form>
+        <p class="form-note">You will be redirected to Paystack to complete payment</p>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>© 2026 Victory Catfish Farm. All Rights Reserved.</p>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+    // Load cart summary into checkout page
+    document.addEventListener('DOMContentLoaded', () => {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      let subtotal = 0;
+      let count = 0;
+      
+      cart.forEach(item => {
+        const product = productData.find(p => String(p.id) === String(item.id));
+        if(product) {
+          subtotal += product.price * item.qty;
+          count += item.qty;
+        }
+      });
+
+      const delivery = 2000;
+      const total = subtotal + delivery;
+
+      document.getElementById('checkoutItemCount').innerText = count;
+      document.getElementById('checkoutSubtotal').innerText = `₦${subtotal.toLocaleString()}`;
+      document.getElementById('checkoutTotal').innerText = `₦${total.toLocaleString()}`;
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head><title>Payment Success</title></head>
+<body style="text-align:center; padding:50px;">
+  <h1>✅ Payment Successful!</h1>
+  <p>We have received your order. We will call you shortly.</p>
+  <a href="index.html">Back to Home</a>
+  
+  <script>
+    // This page will get ?reference=xxxx from Paystack
+    const urlParams = new URLSearchParams(window.location.search);
+    const reference = urlParams.get('reference');
+    if(reference) {
+      fetch(`http://localhost:3000/api/payment/verify/${reference}`)
+      .then(res => res.json())
+      .then(data => console.log("Verified:", data));
+    }
+  </script>
+</body>
+</html>

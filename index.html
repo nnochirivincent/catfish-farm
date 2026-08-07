@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Victory Catfish Farm | Live, Smoked & Fingerlings in Lagos</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header>
+    <div class="container header-container">
+      
+      <!-- LOGO -->
+      <a href="index.html" class="logo">
+        <span class="logo-icon">🐟</span>
+        <span class="logo-text">VICTORY FARM<br><small>Catfish Farm</small></span>
+      </a>
+
+      <!-- NAV LINKS -->
+      <nav class="navbar" id="navbar">
+        <a href="index.html">Home</a>
+        <a href="products.html">Shop</a>
+        <a href="#about">About</a>
+        <a href="#blog">Blog</a>
+        <a href="faq.html">FAQ</a>
+        <a href="contact.html">Contact</a>
+        <a href="cart.html" class="cart-link">
+          Cart <span class="cart-badge" id="cart-count">0</span>
+        </a>
+      </nav>
+
+      <!-- CTA BUTTONS -->
+      <div class="header-actions">
+        <a href="https://wa.me/2348034732228" class="btn-whatsapp-small">💬 WhatsApp</a>
+        <button class="hamburger" id="hamburger">☰</button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ===== HERO SLIDER ===== -->
+  <section class="hero-slider">
+    <div class="slides">
+      <div class="slide active" style="background-image: url('./assets/images/about-farm-catfish.jpeg');">
+        <div class="overlay"></div>
+        <div class="hero-text">
+          <span class="tag">🐟 #1 Catfish Farm in Lagos</span>
+          <h1>Fresh African Catfish <br>Straight From Our Ponds</h1>
+          <p>100% Healthy, Antibiotic-Free Clarias Gariepinus. Same-day delivery across Lagos.</p>
+          <div class="hero-btns">
+            <a href="products.html" class="btn btn-primary">Order Now</a>
+            <a href="#about" class="btn btn-outline-white">Tour Our Farm</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="slide" style="background-image: url('./assets/images/smoked-catfish.jpeg');">
+        <div class="overlay"></div>
+        <div class="hero-text">
+          <span class="tag">🔥 Best for Pepper Soup</span>
+          <h1>Premium Smoked Catfish <br>Well Dried & Sand-Free</h1>
+          <p>Perfect for stews, soups, and parties. Delivered fresh to your doorstep.</p>
+          <div class="hero-btns">
+            <a href="products.html" class="btn btn-primary">Shop Smoked Fish</a>
+            <a href="https://wa.me/2348034732228" class="btn btn-whatsapp">Chat on WhatsApp</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="slide" style="background-image: url('./assets/images/fingelings.jpeg');">
+        <div class="overlay"></div>
+        <div class="hero-text">
+          <span class="tag">💰 Start Your Farm Today</span>
+          <h1>Healthy Fingerlings <br>95% Survival Rate</h1>
+          <p>Get quality fingerlings + free feeding guide. Start making profit in 4 months.</p>
+          <div class="hero-btns">
+            <a href="products.html" class="btn btn-primary">Buy Fingerlings</a>
+            <a href="#blog" class="btn btn-outline-white">Read Farming Tips</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDER DOTS -->
+    <div class="slider-dots">
+      <span class="dot active" data-slide="0"></span>
+      <span class="dot" data-slide="1"></span>
+      <span class="dot" data-slide="2"></span>
+    </div>
+
+    <!-- ARROWS -->
+    <button class="slider-arrow prev">❮</button>
+    <button class="slider-arrow next">❯</button>
+  </section>
+
+  <!-- ===== PRODUCT SIZES SECTION ===== -->
+  <section class="sizes container">
+    <h3>Shop By Size & Type</h3>
+    <div class="size-grid">
+      <div class="size-card">
+        <img src="./assets/images/live-catfish.jpeg" alt="Live African Catfish">
+        <h4>Live Catfish</h4>
+        <p>Fresh Clarias Gariepinus. Available: 1kg, 2kg, 5kg, 10kg+</p>
+        <p class="price">From ₦3,500/kg</p>
+        <button onclick="addToCart(1)" class="btn btn-primary">Add to Cart</button>
+      </div>
+      <div class="size-card">
+        <img src="./assets/images/smoked-catfish.jpeg" alt="Dried Smoked Catfish">
+        <h4>Smoked Catfish</h4>
+        <p>Oven dried catfish. Perfect for stew and pepper soup</p>
+        <p class="price">From ₦5,000/pack</p>
+        <button onclick="addToCart(2)" class="btn btn-primary">Add to Cart</button>
+      </div>
+      <div class="size-card">
+        <img src="./assets/images/3rd-image.jpeg" alt="Catfish Fingerlings">
+        <h4>Fingerlings</h4>
+        <p>3-4 weeks old healthy catfish juveniles for your farm</p>
+        <p class="price">₦8,000/100pcs</p>
+        <button onclick="addToCart(3)" class="btn btn-primary">Add to Cart</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ABOUT SECTION ===== -->
+  <section id="about" class="about">
+    <div class="container">
+      <h3>Inside Our Catfish Farm</h3>
+      <div class="about-grid">
+        <img src="./assets/images/pound.jpeg" alt="Concrete Catfish Ponds">
+        <div>
+          <h4>Clean Water. Healthy Clarias.</h4>
+          <p>Located in Lagos, we specialize in African Catfish <b>Clarias Gariepinus</b>. We raise them in concrete and tarpaulin ponds with daily water exchange and 24/7 aeration.</p>
+          <ul>
+            <li>✅ Daily water quality & oxygen checks</li>
+            <li>✅ High-protein 42% feed for fast growth</li>
+            <li>✅ Harvested fresh within 4 hours of your order</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="farm-features">
+        <div class="feature-card"><h4>🏞️ 12 Large Ponds</h4><p>Concrete & Tarpaulin ponds with 50,000L capacity each.</p></div>
+        <div class="feature-card"><h4>🧪 Water Quality Lab</h4><p>We test pH, Ammonia, and Oxygen every morning.</p></div>
+        <div class="feature-card"><h4>🍽️ Premium Feeding Program</h4><p>Week 1 - 12 feeding table using 42% protein feed.</p></div>
+        <div class="feature-card"><h4>🚚 Fast Harvest & Delivery</h4><p>We harvest on order and deliver across Lagos same day.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== BLOG SECTION ===== -->
+  <section id="blog">
+    <div class="container">
+      <h3>Catfish Farming Tips & Articles</h3>
+      <div class="blog-grid">
+        <div class="blog-card">
+          <img src="./assets/images/feeding-catfish.jpeg" alt="Feeding Catfish">
+          <h4>How to Feed Catfish for Maximum Growth</h4>
+          <p>Learn the best feeding schedule and feed types to grow 1kg catfish in just 4 months...</p>
+          <a href="article-feeding.html" class="btn btn-outline">Read More →</a>
+        </div>
+        <div class="blog-card">
+          <img src="./assets/images/disease-fish.jpeg" alt="Catfish Disease">
+          <h4>5 Common Catfish Diseases & How to Prevent Them</h4>
+          <p>Stop losing fish to disease. Here are the signs and treatments every Lagos farmer should know...</p>
+          <a href="article-diseases.html" class="btn btn-outline">Read More →</a>
+        </div>
+        <div class="blog-card">
+          <img src="./assets/images/market-fish.jpeg" alt="Catfish Profit">
+          <h4>How to Make ₦500k Profit from 1000 Catfish</h4>
+          <p>A breakdown of costs, feeding, and selling price to help you start a profitable catfish farm...</p>
+          <a href="article-profit.html" class="btn btn-outline">Read More →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TESTIMONIALS ===== -->
+  <section class="testimonials">
+    <div class="container">
+      <h3>What Our Customers Say ⭐</h3>
+      <p class="subtitle">Rated 4.9/5 by over 200+ Lagos customers</p>
+      <div class="testimonial-grid" id="testimonialGrid">
+        <div class="testimonial-card"><div class="stars">★★★★★</div><p>"The live catfish arrived fresh and jumping in Lekki within 3 hours."</p><div class="customer"><img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Customer"><div><b>Mrs. Adebayo</b><span>Lekki, Lagos</span></div></div></div>
+        <div class="testimonial-card"><div class="stars">★★★</div><p>"I bought 10kg for my restaurant. The catfish were big, healthy."</p><div class="customer"><img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Customer"><div><b>Chef Tunde</b><span>Yaba, Lagos</span></div></div></div>
+        <div class="testimonial-card"><div class="stars">★★★</div><p>"First time buying fingerlings. All 100 survived."</p><div class="customer"><img src="https://randomuser.me/api/portraits/men/65.jpg" alt="Customer"><div><b>Mr. Ibrahim</b><span>Ikorodu, Lagos</span></div></div></div>
+        <div class="testimonial-card hidden-testimonial"><div class="stars">★★★★★</div><p>"The smoked catfish is the best I've tasted."</p><div class="customer"><img src="https://randomuser.me/api/portraits/women/22.jpg" alt="Customer"><div><b>Mama Nkechi</b><span>Surulere, Lagos</span></div></div></div>
+        <div class="testimonial-card hidden-testimonial"><div class="stars">★★★</div><p>"Customer service is top notch."</p><div class="customer"><img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Customer"><div><b>Ms. Funke</b><span>Ikeja, Lagos</span></div></div></div>
+        <div class="testimonial-card hidden-testimonial"><div class="stars">★★★★★</div><p>"Delivery was fast and the fish was exactly 2kg."</p><div class="customer"><img src="https://randomuser.me/api/portraits/men/45.jpg" alt="Customer"><div><b>Mr. Okafor</b><span>Festac, Lagos</span></div></div></div>
+      </div>
+      <button id="seeMoreBtn" class="btn btn-outline see-more-btn">See More Testimonials ↓</button>
+    </div>
+  </section>
+
+  <!-- ===== CTA SECTION ===== -->
+  <section class="cta">
+    <div class="cta-container">
+      <div class="cta-text">
+        <h3>Ready to Order Fresh Catfish Today?</h3>
+        <p>We deliver live, smoked & fingerlings across all 20 LGAs in Lagos.</p>
+        <div class="cta-badges"><span>✅ Same-Day Delivery</span><span>✅ 100% Healthy Clarias</span><span>✅ Pay on Delivery</span></div>
+        <div class="cta-buttons">
+          <a href="products.html" class="btn btn-primary btn-large">Shop Now</a>
+          <a href="https://wa.me/2348034732228" class="btn btn-whatsapp btn-large">💬 Chat on WhatsApp</a>
+        </div>
+        <p class="cta-note">Delivery: Mon - Sat | 8AM - 6PM | Lagos Only</p>
+      </div>
+      <div class="cta-image">
+        <img src="./assets/images/about-farm-catfish.jpeg" alt="Fresh Catfish Delivery">
+      </div>
+    </div>
+  </section>
+  <!-- CHECKOUT MODAL -->
+<div id="checkoutModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center;">
+  <div style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px;">
+    <h2>Complete Your Order</h2>
+    <form id="checkoutForm">
+      <input id="customerName" type="text" placeholder="Full Name" required style="width:100%; padding:10px; margin:8px 0;"><br>
+      <input id="customerEmail" type="email" placeholder="Email" required style="width:100%; padding:10px; margin:8px 0;"><br>
+      <input id="customerPhone" type="tel" placeholder="Phone Number" required style="width:100%; padding:10px; margin:8px 0;"><br>
+      <textarea id="customerAddress" placeholder="Delivery Address" required style="width:100%; padding:10px; margin:8px 0;"></textarea><br>
+      
+      <button type="submit" id="payNowBtn" style="background:#2ecc71; color:white; padding:12px; border:none; width:100%; border-radius:8px;">
+        Pay Now ₦<span id="finalAmount">0</span>
+      </button>
+      <button type="button" onclick="document.getElementById('checkoutModal').style.display='none'" style="background:#ccc; color:black; padding:12px; border:none; width:100%; border-radius:8px; margin-top:8px;">
+        Cancel
+      </button>
+    </form>
+  </div>
+</div>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <div class="footer-container">
+      <div class="footer-col">
+        <h4>🐟 Victory Catfish Farm</h4>
+        <p>Your #1 source for fresh, healthy, antibiotic-free African Catfish in Lagos.</p>
+        <div class="socials"><a href="https://wa.me/2348034732228">📱</a><a href="#">📸</a><a href="#">📘</a></div>
+      </div>
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="products.html">Shop Catfish</a></li>
+          <li><a href="#about">About Our Farm</a></li>
+          <li><a href="#blog">Farming Blog</a></li>
+          <li><a href="cart.html">View Cart</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contact Us</h4>
+        <ul class="contact-info">
+          <li>📍 Lagos, Nigeria</li>
+          <li>📞 WhatsApp: <a href="https://wa.me/2348034732228">080-3473-2228</a></li>
+          <li>⏰ Mon - Sat: 8AM - 6PM</li>
+          <li>🚚 Same-Day Delivery in Lagos</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2026 Victory Catfish Farm. All Rights Reserved. | Made with 💚 in Lagos</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+
+  
+</body>
+</html>
