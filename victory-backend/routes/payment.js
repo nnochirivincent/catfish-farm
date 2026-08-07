@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const router = express.Router();
-const Order = require('../models/Order');
+const order = require('../models/order');
 const axios = require('axios');
 
 const PAYSTACK_SECRET = process.env.PAYSTACK_SECRET_KEY;
