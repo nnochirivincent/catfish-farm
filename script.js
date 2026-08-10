@@ -341,7 +341,7 @@ function initPaystackCheckout() {
 
     try {
       // Step A: Save Order in Database
-      const orderRes = await fetch('http://localhost:3000/api/payment/order', {
+      const orderRes = await fetch('https://victory-backend-vt8k.onrender.com/api/payment/order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -353,7 +353,7 @@ function initPaystackCheckout() {
       }
 
       // Step B: Initialize Paystack
-      const payRes = await fetch('http://localhost:3000/api/payment/pay', {
+      const payRes = await fetch('https://victory-backend-vt8k.onrender.com/api/payment/pay', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
