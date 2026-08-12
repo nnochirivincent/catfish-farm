@@ -18,7 +18,7 @@ router.post('/order', async (req, res) => {
       });
     }
 
-    const order = new Order({
+    const order = new order({
       customerName: name,
       customerEmail: email,
       customerPhone: phone || '',
