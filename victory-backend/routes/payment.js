@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const router = express.Router();
-const order = require('../models/order');
+const Order = require('../models/order'); // Fixed capital 'O'
 const axios = require('axios');
 
 const PAYSTACK_SECRET = process.env.PAYSTACK_SECRET_KEY;
@@ -18,7 +18,7 @@ router.post('/order', async (req, res) => {
       });
     }
 
-    const order = new order({
+    const order = new Order({
       customerName: name,
       customerEmail: email,
       customerPhone: phone || '',
@@ -49,7 +49,7 @@ router.post('/pay', async (req, res) => {
     
     const callbackUrl = process.env.FRONTEND_URL 
       ? `${process.env.FRONTEND_URL}/payment-success.html` 
-      : 'http://127.0.0.1:5500/payment-success.html';
+      : 'https://nnochirivincent.github.io/catfish-farm/payment-success.html'; // Live fallback
 
     const response = await axios.post(
       'https://api.paystack.co/transaction/initialize',
@@ -67,7 +67,7 @@ router.post('/pay', async (req, res) => {
       }
     );
 
-    res.json(response.data); // Returns { status: true, data: { authorization_url: ... } }
+    res.json(response.data);
   } catch (err) {
     console.log("Paystack Init Error:", err.response?.data || err.message);
     res.status(500).json({ 
