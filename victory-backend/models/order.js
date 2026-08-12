@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+
 const orderSchema = new mongoose.Schema({
   customerName: { type: String, required: true },
   customerEmail: { type: String, required: true },
@@ -9,7 +10,7 @@ const orderSchema = new mongoose.Schema({
   totalAmount: { type: Number, required: true },
   paymentStatus: { type: String, default: 'pending' }, // pending, paid, failed
   paystackRef: { type: String },
-  deliveryAddress: { type: String }
+  deliveryAddress: { type: String } // Removed stray "orde" here
 }, { timestamps: true });
 
 module.exports = mongoose.model('Order', orderSchema);
