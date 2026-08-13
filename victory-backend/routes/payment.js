@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config(); // FIXED: lowercase 'r'
 const express = require('express');
 const router = express.Router();
 const Order = require('../models/order'); // Fixed capital 'O'
@@ -47,9 +47,15 @@ router.post('/pay', async (req, res) => {
   try {
     const { email, amount, orderId } = req.body;
     
-    const callbackUrl = process.env.FRONTEND_URL 
-      ? `${process.env.FRONTEND_URL}/payment-success.html` 
-      : 'https://nnochirivincent.github.io/catfish-farm/payment-success.html'; // Live fallback
+    // Fetch URL from Render
+    let frontendUrl = process.env.FRONTEND_URL || 'https://nnochirivincent.github.io/catfish-farm';
+    
+    // SAFETY NET: If the Render variable accidentally contains markdown brackets, ignore it and use the clean link
+    if (frontendUrl.includes('](')) {
+       frontendUrl = 'https://nnochirivincent.github.io/catfish-farm';
+    }
+
+    const callbackUrl = `${frontendUrl}/payment-success.html`;
 
     const response = await axios.post(
       'https://api.paystack.co/transaction/initialize',
