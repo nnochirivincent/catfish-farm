@@ -341,7 +341,7 @@ function initPaystackCheckout() {
 
     try {
       // Step A: Save Order in Database
-      const orderRes = await fetch('https://victory-backend-vt8k.onrender.com/api/payment/order', {
+      const orderRes = await fetch('https://victory-backend-vt8k.onrender.com/api/payment/order', { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
