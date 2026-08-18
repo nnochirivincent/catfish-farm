@@ -22,6 +22,7 @@
       <nav class="navbar" id="navbar">
         <a href="index.html">Home</a>
         <a href="products.html">Shop</a>
+        <a href="#feed-calculator">Calculator</a>
         <a href="#about">About</a>
         <a href="#blog">Blog</a>
         <a href="faq.html">FAQ</a>
@@ -123,6 +124,225 @@
     </div>
   </section>
 
+  <!-- ===== SMART FISH FEED CALCULATOR SECTION ===== -->
+  <section id="feed-calculator" class="calc-wrapper">
+    <div class="calc-glow-bg"></div>
+    
+    <div class="calc-container">
+      <!-- Header -->
+      <div class="calc-header">
+        <span class="calc-badge">⚡ Interactive Tool</span>
+        <h2>Smart Fish Feed Calculator</h2>
+        <p>Optimize your daily feeding, reduce waste, and calculate precise pellet requirements for your stock in seconds.</p>
+      </div>
+
+      <!-- Form & Inputs Card -->
+      <div class="calc-card">
+        <form id="feed-calc-form" onsubmit="event.preventDefault();">
+          <div class="calc-inputs-grid">
+            
+            <!-- Field 1: Species -->
+            <div class="input-field">
+              <label for="species">
+                <span class="field-icon">🐟</span> Select Species
+              </label>
+              <div class="select-wrapper">
+                <select id="species" required>
+                  <option value="catfish" selected>Catfish (African Sharptooth)</option>
+                  <option value="tilapia">Tilapia</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Field 2: Stock Count -->
+            <div class="input-field">
+              <label for="stock-count">
+                <span class="field-icon">📊</span> Total Stock Quantity
+              </label>
+              <input type="number" id="stock-count" placeholder="e.g. 1000 pcs" min="1" required>
+            </div>
+
+            <!-- Field 3: Average Weight -->
+            <div class="input-field">
+              <label for="avg-weight">
+                <span class="field-icon">⚖️</span> Average Weight (Grams)
+              </label>
+              <input type="number" id="avg-weight" placeholder="e.g. 150g" min="1" step="0.1" required>
+            </div>
+
+          </div>
+
+          <button type="button" id="calc-feed-btn" class="calc-action-btn">
+            <span>Calculate Feed Schedule</span>
+            <svg class="btn-arrow" viewBox="0 0 24 24" width="20" height="20"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </button>
+        </form>
+      </div>
+
+      <!-- Results Dashboard Card (Hidden until calculated) -->
+      <div id="calc-results" class="results-dashboard hidden">
+        <div class="results-header">
+          <h3>🎯 Recommended Daily Feeding Plan</h3>
+          <span class="status-pill">Calculated</span>
+        </div>
+
+        <div class="metrics-grid">
+          <!-- Metric 1 -->
+          <div class="metric-card highlight-metric">
+            <div class="metric-icon">📦</div>
+            <div class="metric-info">
+              <span class="metric-label">Daily Feed Needed</span>
+              <span class="metric-value" id="res-daily-kg">0.00 kg</span>
+            </div>
+          </div>
+
+          <!-- Metric 2 -->
+          <div class="metric-card">
+            <div class="metric-icon">📈</div>
+            <div class="metric-info">
+              <span class="metric-label">Feeding Rate</span>
+              <span class="metric-value" id="res-feed-rate">0% Body Weight</span>
+            </div>
+          </div>
+
+          <!-- Metric 3 -->
+          <div class="metric-card">
+            <div class="metric-icon">🔘</div>
+            <div class="metric-info">
+              <span class="metric-label">Pellet Size</span>
+              <span class="metric-value" id="res-pellet-size">-</span>
+            </div>
+          </div>
+
+          <!-- Metric 4 -->
+          <div class="metric-card">
+            <div class="metric-icon">⏰</div>
+            <div class="metric-info">
+              <span class="metric-label">Feeding Frequency</span>
+              <span class="metric-value" id="res-schedule">-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Monthly Summary Banner -->
+        <div class="monthly-banner">
+          <div class="banner-icon">💡</div>
+          <div class="banner-text">
+            <strong>Monthly Planning (30 Days):</strong> You will need approximately <span id="res-monthly-bags" class="banner-highlight">0 Bags</span> (15kg bags) to feed this batch.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- BATCH PROFITABILITY ESTIMATOR SECTION -->
+<section id="profitability-estimator" class="estimator-section" style="padding: 60px 20px; background-color: #f8fafc;">
+  <div class="container" style="max-width: 1100px; margin: 0 auto;">
+    <div style="text-align: center; margin-bottom: 40px;">
+      <h2 style="font-size: 2.2rem; color: #0f172a; margin-bottom: 10px;">📊 Interactive Batch Profitability Estimator</h2>
+      <p style="color: #475569; font-size: 1rem;">Project your catfish farming production costs, feed requirement, revenue, and net profit before stocking.</p>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px;">
+      <!-- INPUT FORM -->
+      <div style="background: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
+        <h3 style="font-size: 1.3rem; margin-bottom: 20px; color: #1e293b;">1. Input Batch Parameters</h3>
+        
+        <div style="margin-bottom: 15px;">
+          <label style="display: block; font-weight: 600; margin-bottom: 5px;">Total Fish Stocked (Quantity)</label>
+          <input type="number" id="est-stock-count" placeholder="e.g. 1000" value="1000" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
+        </div>
+
+        <div style="margin-bottom: 15px;">
+          <label style="display: block; font-weight: 600; margin-bottom: 5px;">Target Harvest Weight (kg per fish)</label>
+          <input type="number" step="0.1" id="est-target-weight" placeholder="e.g. 1.0" value="1.0" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
+        </div>
+
+        <div style="margin-bottom: 15px;">
+          <label style="display: block; font-weight: 600; margin-bottom: 5px;">Expected Mortality Rate (%)</label>
+          <input type="number" id="est-mortality" placeholder="e.g. 5" value="5" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
+        </div>
+
+        <div style="margin-bottom: 15px;">
+          <label style="display: block; font-weight: 600; margin-bottom: 5px;">Cost per Fingerling/Juvenile (₦)</label>
+          <input type="number" id="est-fingerling-cost" placeholder="e.g. 80" value="80" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
+        </div>
+
+        <div style="margin-bottom: 15px;">
+          <label style="display: block; font-weight: 600; margin-bottom: 5px;">Average Feed Cost per 15kg Bag (₦)</label>
+          <input type="number" id="est-feed-bag-cost" placeholder="e.g. 22000" value="22000" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
+        </div>
+
+        <div style="margin-bottom: 15px;">
+          <label style="display: block; font-weight: 600; margin-bottom: 5px;">Target Market Selling Price per kg (₦)</label>
+          <input type="number" id="est-selling-price" placeholder="e.g. 3500" value="3500" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
+        </div>
+
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; font-weight: 600; margin-bottom: 5px;">Other Overhead Expenses (Pumping, Labor, Drugs) (₦)</label>
+          <input type="number" id="est-overheads" placeholder="e.g. 50000" value="50000" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
+        </div>
+
+        <button id="calc-profit-btn" style="width: 100%; background: #16a34a; color: white; padding: 12px; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s;">
+          📈 Calculate Batch Profitability
+        </button>
+      </div>
+
+      <!-- RESULTS DASHBOARD -->
+      <div id="profit-results" style="background: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <h3 style="font-size: 1.3rem; margin-bottom: 20px; color: #1e293b;">2. Estimated Financial Summary</h3>
+          
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+            <div style="background: #f1f5f9; padding: 12px; border-radius: 8px;">
+              <small style="color: #64748b; font-weight: 600;">Surviving Harvest Stock</small>
+              <h4 id="res-surviving-fish" style="font-size: 1.2rem; color: #0f172a; margin-top: 4px;">-- pcs</h4>
+            </div>
+            <div style="background: #f1f5f9; padding: 12px; border-radius: 8px;">
+              <small style="color: #64748b; font-weight: 600;">Total Harvest Biomass</small>
+              <h4 id="res-total-biomass" style="font-size: 1.2rem; color: #0f172a; margin-top: 4px;">-- kg</h4>
+            </div>
+            <div style="background: #f1f5f9; padding: 12px; border-radius: 8px;">
+              <small style="color: #64748b; font-weight: 600;">Feed Required (15kg bags)</small>
+              <h4 id="res-total-bags" style="font-size: 1.2rem; color: #0f172a; margin-top: 4px;">-- bags</h4>
+            </div>
+            <div style="background: #f1f5f9; padding: 12px; border-radius: 8px;">
+              <small style="color: #64748b; font-weight: 600;">Total Production Cost</small>
+              <h4 id="res-total-cost" style="font-size: 1.2rem; color: #dc2626; margin-top: 4px;">₦0</h4>
+            </div>
+          </div>
+
+          <div style="border-top: 2px dashed #e2e8f0; padding-top: 20px; margin-top: 10px;">
+            <div style="margin-bottom: 12px; display: flex; justify-content: space-between;">
+              <span style="color: #475569;">Projected Gross Revenue:</span>
+              <strong id="res-revenue" style="color: #0f172a;">₦0</strong>
+            </div>
+            <div style="margin-bottom: 12px; display: flex; justify-content: space-between;">
+              <span style="color: #475569;">Net Projected Profit:</span>
+              <strong id="res-net-profit" style="color: #16a34a; font-size: 1.2rem;">₦0</strong>
+            </div>
+            <div style="margin-bottom: 12px; display: flex; justify-content: space-between;">
+              <span style="color: #475569;">Return on Investment (ROI):</span>
+              <strong id="res-roi" style="color: #2563eb;">0%</strong>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: #475569;">Profit Margin:</span>
+              <strong id="res-margin" style="color: #2563eb;">0%</strong>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 25px;">
+          <button id="save-estimate-btn" style="width: 100%; background: #0284c7; color: white; padding: 10px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">
+            💾 Save Estimate to Database
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
   <!-- ===== ABOUT SECTION ===== -->
   <section id="about" class="about">
     <div class="container">
@@ -211,25 +431,26 @@
       </div>
     </div>
   </section>
+
   <!-- CHECKOUT MODAL -->
-<div id="checkoutModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center;">
-  <div style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px;">
-    <h2>Complete Your Order</h2>
-    <form id="checkoutForm">
-      <input id="customerName" type="text" placeholder="Full Name" required style="width:100%; padding:10px; margin:8px 0;"><br>
-      <input id="customerEmail" type="email" placeholder="Email" required style="width:100%; padding:10px; margin:8px 0;"><br>
-      <input id="customerPhone" type="tel" placeholder="Phone Number" required style="width:100%; padding:10px; margin:8px 0;"><br>
-      <textarea id="customerAddress" placeholder="Delivery Address" required style="width:100%; padding:10px; margin:8px 0;"></textarea><br>
-      
-      <button type="submit" id="payNowBtn" style="background:#2ecc71; color:white; padding:12px; border:none; width:100%; border-radius:8px;">
-        Pay Now ₦<span id="finalAmount">0</span>
-      </button>
-      <button type="button" onclick="document.getElementById('checkoutModal').style.display='none'" style="background:#ccc; color:black; padding:12px; border:none; width:100%; border-radius:8px; margin-top:8px;">
-        Cancel
-      </button>
-    </form>
+  <div id="checkoutModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center;">
+    <div style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px;">
+      <h2>Complete Your Order</h2>
+      <form id="checkoutForm">
+        <input id="customerName" type="text" placeholder="Full Name" required style="width:100%; padding:10px; margin:8px 0;"><br>
+        <input id="customerEmail" type="email" placeholder="Email" required style="width:100%; padding:10px; margin:8px 0;"><br>
+        <input id="customerPhone" type="tel" placeholder="Phone Number" required style="width:100%; padding:10px; margin:8px 0;"><br>
+        <textarea id="customerAddress" placeholder="Delivery Address" required style="width:100%; padding:10px; margin:8px 0;"></textarea><br>
+        
+        <button type="submit" id="payNowBtn" style="background:#2ecc71; color:white; padding:12px; border:none; width:100%; border-radius:8px;">
+          Pay Now ₦<span id="finalAmount">0</span>
+        </button>
+        <button type="button" onclick="document.getElementById('checkoutModal').style.display='none'" style="background:#ccc; color:black; padding:12px; border:none; width:100%; border-radius:8px; margin-top:8px;">
+          Cancel
+        </button>
+      </form>
+    </div>
   </div>
-</div>
 
   <!-- ===== FOOTER ===== -->
   <footer>
@@ -267,6 +488,6 @@
 
   <script src="script.js"></script>
 
-  
 </body>
 </html>
+    
