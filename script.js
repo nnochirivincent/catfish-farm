@@ -7,7 +7,7 @@ const API_BASE_URL = 'https://victory-backend-vt8k.onrender.com';
 // Wait for DOM to load fully
 document.addEventListener('DOMContentLoaded', () => {
   initFeedCalculator();
-  initProfitabilityEstimator(); // Initialized Profitability Estimator
+  initProfitabilityEstimator();
   initMobileMenu();
   loadProductsFromBackend();
   initCheckoutModal();
@@ -15,58 +15,68 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ===== 1. SMART FEED CALCULATOR =====
 function initFeedCalculator() {
-  const calculateBtn = document.getElementById('calculate-feed-btn');
+  const calculateBtn = document.getElementById('calc-feed-btn');
   if (!calculateBtn) return;
 
   calculateBtn.addEventListener('click', () => {
-    const totalFish = parseFloat(document.getElementById('calc-total-fish')?.value);
-    const avgWeight = parseFloat(document.getElementById('calc-avg-weight')?.value);
-    const growthStage = document.getElementById('calc-stage')?.value;
+    const totalFish = parseFloat(document.getElementById('stock-count')?.value);
+    const avgWeight = parseFloat(document.getElementById('avg-weight')?.value);
+    const species = document.getElementById('species')?.value;
 
     if (!totalFish || !avgWeight || totalFish <= 0 || avgWeight <= 0) {
       alert("Please enter valid positive numbers for total fish and average weight.");
       return;
     }
 
-    // Determine Feeding Rate percentage based on growth stage
-    let feedingRatePercent = 0;
-    let pelletSize = '';
-    let feedingFrequency = '';
+    // Determine stage & feeding rate based on average weight (grams)
+    let feedingRatePercent = 2.5;
+    let pelletSize = '3.0mm';
+    let schedule = '2 times daily';
 
-    if (growthStage === 'fry') {
+    if (avgWeight <= 5) {
       feedingRatePercent = 8.0;
-      pelletSize = '0.5mm - 1.2mm (Powder / Micro Crumble)';
-      feedingFrequency = '4 - 6 times daily';
-    } else if (growthStage === 'fingerling') {
+      pelletSize = '0.5mm - 1.2mm Crumble';
+      schedule = '4 - 6 times daily';
+    } else if (avgWeight <= 20) {
       feedingRatePercent = 5.0;
       pelletSize = '1.5mm - 2.0mm Pellets';
-      feedingFrequency = '3 - 4 times daily';
-    } else if (growthStage === 'juvenile') {
+      schedule = '3 - 4 times daily';
+    } else if (avgWeight <= 100) {
       feedingRatePercent = 3.5;
-      pelletSize = '3.0mm - 4.0mm Pellets';
-      feedingFrequency = '2 - 3 times daily';
-    } else if (growthStage === 'growout') {
-      feedingRatePercent = 2.0;
+      pelletSize = '2.0mm - 3.0mm Pellets';
+      schedule = '2 - 3 times daily';
+    } else if (avgWeight <= 400) {
+      feedingRatePercent = 2.5;
+      pelletSize = '4.0mm - 6.0mm Pellets';
+      schedule = '2 times daily';
+    } else {
+      feedingRatePercent = 1.8;
       pelletSize = '6.0mm - 9.0mm Pellets';
-      feedingFrequency = '1 - 2 times daily';
+      schedule = '1 - 2 times daily';
     }
 
     // Calculations
-    const totalBiomassKg = (totalFish * avgWeight) / 1000; // grams to kg
+    const totalBiomassKg = (totalFish * avgWeight) / 1000;
     const dailyFeedKg = (totalBiomassKg * feedingRatePercent) / 100;
     const monthlyFeedKg = dailyFeedKg * 30;
-    const bags30Days = Math.ceil(monthlyFeedKg / 15); // 15kg per bag standard
+    const bags30Days = Math.ceil(monthlyFeedKg / 15);
 
-    // Render Results
-    document.getElementById('res-biomass').textContent = `${totalBiomassKg.toFixed(2)} kg`;
-    document.getElementById('res-daily-feed').textContent = `${dailyFeedKg.toFixed(2)} kg / day`;
-    document.getElementById('res-monthly-feed').textContent = `${monthlyFeedKg.toFixed(1)} kg (${bags30Days} bags/month)`;
-    document.getElementById('res-pellet-size').textContent = pelletSize;
-    document.getElementById('res-frequency').textContent = feedingFrequency;
+    // Update HTML Outputs
+    const setTxt = (id, txt) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = txt;
+    };
 
-    const resultBox = document.getElementById('calculator-results');
-    if (resultBox) {
-      resultBox.style.display = 'block';
+    setTxt('res-daily-kg', `${dailyFeedKg.toFixed(2)} kg / day`);
+    setTxt('res-feed-rate', `${feedingRatePercent}% Body Weight`);
+    setTxt('res-pellet-size', pelletSize);
+    setTxt('res-schedule', schedule);
+    setTxt('res-monthly-bags', `${bags30Days} Bags (${monthlyFeedKg.toFixed(1)} kg)`);
+
+    const resultsCard = document.getElementById('calc-results');
+    if (resultsCard) {
+      resultsCard.classList.remove('hidden');
+      resultsCard.style.display = 'block';
     }
   });
 }
@@ -91,7 +101,7 @@ function initProfitabilityEstimator() {
     const inputs = getInputs();
 
     if (!inputs.stockCount || !inputs.targetWeightKg || !inputs.fingerlingCost || !inputs.feedCostPerBag || !inputs.sellingPricePerKg) {
-      alert("Please fill in all mandatory numerical fields.");
+      alert("Please fill in all required numbers.");
       return;
     }
 
@@ -105,25 +115,33 @@ function initProfitabilityEstimator() {
       });
 
       const resData = await response.json();
-      if (!resData.success) throw new Error(resData.message || 'Calculation failed');
+      if (!response.ok || !resData.success) {
+        throw new Error(resData.message || 'Calculation failed on backend');
+      }
 
       const m = resData.data;
 
-      // Render Outputs
-      document.getElementById('res-surviving-fish').textContent = `${m.survivingFish.toLocaleString()} pcs`;
-      document.getElementById('res-total-biomass').textContent = `${m.totalBiomassKg.toLocaleString()} kg`;
-      document.getElementById('res-total-bags').textContent = `${m.totalFeedBagsNeeded} bags (${(m.totalFeedBagsNeeded * 15).toLocaleString()}kg)`;
-      document.getElementById('res-total-cost').textContent = `₦${m.totalProductionCost.toLocaleString()}`;
-      document.getElementById('res-revenue').textContent = `₦${m.projectedRevenue.toLocaleString()}`;
-      document.getElementById('res-net-profit').textContent = `₦${m.projectedNetProfit.toLocaleString()}`;
-      document.getElementById('res-roi').textContent = `${m.roiPercent}%`;
-      document.getElementById('res-margin').textContent = `${m.profitMarginPercent}%`;
+      // Safe Element Assigner
+      const setTxt = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val;
+      };
+
+      setTxt('res-surviving-fish', `${m.survivingFish.toLocaleString()} pcs`);
+      setTxt('res-total-biomass', `${m.totalBiomassKg.toLocaleString()} kg`);
+      setTxt('res-total-bags', `${m.totalFeedBagsNeeded} bags (${(m.totalFeedBagsNeeded * 15).toLocaleString()}kg)`);
+      setTxt('res-total-cost', `₦${m.totalProductionCost.toLocaleString()}`);
+      setTxt('res-revenue', `₦${m.projectedRevenue.toLocaleString()}`);
+      setTxt('res-net-profit', `₦${m.projectedNetProfit.toLocaleString()}`);
+      setTxt('res-roi', `${m.roiPercent}%`);
+      setTxt('res-margin', `${m.profitMarginPercent}%`);
 
       if (save) {
         alert("Batch estimate saved successfully to database! 🚀");
       }
 
     } catch (err) {
+      console.error("Estimator error:", err);
       alert("Estimator Error: " + err.message);
     } finally {
       if (saveBtn) saveBtn.textContent = "💾 Save Estimate to Database";
@@ -136,12 +154,12 @@ function initProfitabilityEstimator() {
 
 // ===== 3. MOBILE MENU TOGGLE =====
 function initMobileMenu() {
-  const hamburger = document.querySelector('.hamburger');
-  const navLinks = document.querySelector('.nav-links');
+  const hamburger = document.getElementById('hamburger');
+  const navbar = document.getElementById('navbar');
 
-  if (hamburger && navLinks) {
+  if (hamburger && navbar) {
     hamburger.addEventListener('click', () => {
-      navLinks.classList.toggle('active');
+      navbar.classList.toggle('active');
     });
   }
 }
@@ -159,15 +177,12 @@ async function loadProductsFromBackend() {
     renderProducts(products, container);
   } catch (error) {
     console.error('Error fetching products:', error);
-    container.innerHTML = `<p style="color: red; text-align: center;">Unable to load products. Please refresh or try again later.</p>`;
   }
 }
 
-// Render Products Grid
 function renderProducts(products, container) {
   container.innerHTML = '';
-
-  if (products.length === 0) {
+  if (!products || products.length === 0) {
     container.innerHTML = `<p style="text-align: center;">No products available at the moment.</p>`;
     return;
   }
@@ -175,7 +190,6 @@ function renderProducts(products, container) {
   products.forEach(product => {
     const card = document.createElement('div');
     card.className = 'product-card';
-
     card.innerHTML = `
       <img src="${product.image || 'https://via.placeholder.com/300x200'}" alt="${product.name}">
       <div class="product-info">
@@ -189,7 +203,6 @@ function renderProducts(products, container) {
         </div>
       </div>
     `;
-
     container.appendChild(card);
   });
 }
@@ -197,13 +210,11 @@ function renderProducts(products, container) {
 // ===== 5. SHOPPING CART MANAGEMENT =====
 function addToCart(id, name, price, image) {
   const existingIndex = cart.findIndex(item => item.id === id);
-
   if (existingIndex > -1) {
     cart[existingIndex].quantity += 1;
   } else {
     cart.push({ id, name, price, image, quantity: 1 });
   }
-
   updateCartUI();
   alert(`${name} added to cart!`);
 }
@@ -227,80 +238,20 @@ function updateQuantity(id, change) {
 
 function updateCartUI() {
   const cartBadge = document.getElementById('cart-count');
-  const cartItemsContainer = document.getElementById('cart-items-container');
-  const cartTotalElement = document.getElementById('cart-total');
-
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
   if (cartBadge) cartBadge.textContent = totalItems;
-  if (cartTotalElement) cartTotalElement.textContent = `₦${totalPrice.toLocaleString()}`;
-
-  if (cartItemsContainer) {
-    cartItemsContainer.innerHTML = '';
-
-    if (cart.length === 0) {
-      cartItemsContainer.innerHTML = `<p>Your cart is empty.</p>`;
-      return;
-    }
-
-    cart.forEach(item => {
-      const itemRow = document.createElement('div');
-      itemRow.className = 'cart-item-row';
-      itemRow.style.display = 'flex';
-      itemRow.style.alignItems = 'center';
-      itemRow.style.justifyContent = 'space-between';
-      itemRow.style.marginBottom = '10px';
-
-      itemRow.innerHTML = `
-        <div>
-          <strong>${item.name}</strong>
-          <div>₦${item.price.toLocaleString()} x ${item.quantity} = ₦${(item.price * item.quantity).toLocaleString()}</div>
-        </div>
-        <div style="display: flex; gap: 5px; align-items: center;">
-          <button onclick="updateQuantity('${item.id}', -1)">-</button>
-
-          <span>${item.quantity}</span>
-          <button onclick="updateQuantity('${item.id}', 1)">+</button>
-          <button onclick="removeFromCart('${item.id}')" style="background: red; color: white; border: none; border-radius: 3px; cursor: pointer;">&times;</button>
-        </div>
-      `;
-
-      cartItemsContainer.appendChild(itemRow);
-    });
-  }
 }
 
-// ===== 6. CHECKOUT & PAYMENT MODAL =====
+// ===== 6. CHECKOUT MODAL =====
 function initCheckoutModal() {
-  const checkoutBtn = document.getElementById('checkout-btn');
-  const modal = document.getElementById('checkout-modal');
-  const closeModalBtn = document.getElementById('close-modal-btn');
-  const checkoutForm = document.getElementById('checkout-form');
-
-  if (checkoutBtn && modal) {
-    checkoutBtn.addEventListener('click', () => {
-      if (cart.length === 0) {
-        alert("Your cart is empty!");
-        return;
-      }
-      modal.style.display = 'block';
-    });
-  }
-
-  if (closeModalBtn && modal) {
-    closeModalBtn.addEventListener('click', () => {
-      modal.style.display = 'none';
-    });
-  }
-
+  const checkoutForm = document.getElementById('checkoutForm');
   if (checkoutForm) {
     checkoutForm.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      const name = document.getElementById('customer-name')?.value;
-      const email = document.getElementById('customer-email')?.value;
-      const phone = document.getElementById('customer-phone')?.value;
+      const name = document.getElementById('customerName')?.value;
+      const email = document.getElementById('customerEmail')?.value;
+      const phone = document.getElementById('customerPhone')?.value;
 
       if (!name || !email || !phone) {
         alert("Please complete all checkout fields.");
@@ -313,25 +264,16 @@ function initCheckoutModal() {
         const response = await fetch(`${API_BASE_URL}/api/payment/initialize`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email,
-            amount: totalAmount,
-            customerName: name,
-            phone,
-            cart
-          })
+          body: JSON.stringify({ email, amount: totalAmount, customerName: name, phone, cart })
         });
 
         const data = await response.json();
-
         if (data.status && data.data.authorization_url) {
-          // Redirect user to Paystack checkout URL
           window.location.href = data.data.authorization_url;
         } else {
           alert("Payment initialization failed: " + (data.message || "Unknown error"));
         }
       } catch (err) {
-        console.error("Checkout error:", err);
         alert("Payment Error: " + err.message);
       }
     });
