@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Saved Batch Estimates | Victory Catfish Farm</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .admin-container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+    .table-wrapper { overflow-x: auto; background: #fff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+    th, td { padding: 12px 16px; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
+    th { background-color: #0f172a; color: #fff; font-weight: 600; }
+    tr:hover { background-color: #f8fafc; }
+    .badge-profit { background: #dcfce7; color: #166534; padding: 4px 8px; border-radius: 4px; font-weight: 600; }
+    .badge-loss { background: #fee2e2; color: #991b1b; padding: 4px 8px; border-radius: 4px; font-weight: 600; }
+  </style>
+</head>
+<body style="background-color: #f1f5f9;">
+
+  <div class="admin-container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+      <h2>📊 Saved Batch Estimates (Admin View)</h2>
+      <button id="refresh-btn" onclick="loadEstimates()" style="padding: 10px 16px; background: #0284c7; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">🔄 Refresh Data</button>
+    </div>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Date Saved</th>
+            <th>Stock Count</th>
+            <th>Target Wt (kg)</th>
+            <th>Feed Cost/Bag</th>
+            <th>Selling Price/kg</th>
+            <th>Total Cost</th>
+            <th>Projected Revenue</th>
+            <th>Net Profit</th>
+            <th>ROI</th>
+          </tr>
+        </thead>
+        <tbody id="estimates-table-body">
+          <tr>
+            <td colspan="9" style="text-align: center; padding: 20px;">Loading saved estimates...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE_URL = 'https://victory-backend-vt8k.onrender.com';
+
+    async function loadEstimates() {
+      const tbody = document.getElementById('estimates-table-body');
+      tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 20px;">Loading...</td></tr>`;
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/estimator/saved`);
+        const resData = await response.json();
+
+        if (!resData.success || !resData.data || resData.data.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; padding: 20px;">No saved estimates found in database.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = '';
+        resData.data.forEach(item => {
+          const date = new Date(item.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+          const m = item.calculatedMetrics;
+          const isProfitable = m.projectedNetProfit >= 0;
+
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${date}</td>
+            <td>${item.stockCount.toLocaleString()} pcs</td>
+            <td>${item.targetWeightKg} kg</td>
+            <td>₦${item.feedCostPerBag.toLocaleString()}</td>
+            <td>₦${item.sellingPricePerKg.toLocaleString()}</td>
+            <td style="color: #dc2626; font-weight: 600;">₦${m.totalProductionCost.toLocaleString()}</td>
+            <td>₦${m.projectedRevenue.toLocaleString()}</td>
+            <td><span class="${isProfitable ? 'badge-profit' : 'badge-loss'}">₦${m.projectedNetProfit.toLocaleString()}</span></td>
+            <td><strong>${m.roiPercent}%</strong></td>
+          `;
+          tbody.appendChild(row);
+        });
+
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align: center; color: red; padding: 20px;">Error loading data: ${err.message}</td></tr>`;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadEstimates);
+  </script>
+</body>
+</html>
