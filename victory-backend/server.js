@@ -18,9 +18,11 @@ app.use(express.json());
 // 3. IMPORT ROUTES
 const productRoutes = require('./routes/product');
 const paymentRoutes = require('./routes/payment');
+const estimatorRoutes = require('./routes/estimator'); // <-- ADDED ESTIMATOR ROUTE
 
 app.use('/api', productRoutes);
 app.use('/api/payment', paymentRoutes);
+app.use('/api/estimator', estimatorRoutes); // <-- MOUNTED ESTIMATOR ROUTE
 
 // 4. DATABASE CONNECTION
 mongoose.connect(process.env.MONGO_URL)
