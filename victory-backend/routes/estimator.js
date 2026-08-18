@@ -84,4 +84,19 @@ router.post('/calculate', async (req, res) => {
   }
 });
 
+// GET /api/estimator/saved - Fetch all saved estimates sorted by newest first
+router.get('/saved', async (req, res) => {
+  try {
+    const estimates = await BatchEstimate.find().sort({ createdAt: -1 });
+    return res.status(200).json({
+      success: true,
+      count: estimates.length,
+      data: estimates
+    });
+  } catch (error) {
+    console.error('Fetch Estimates Error:', error);
+    return res.status(500).json({ success: false, message: 'Failed to retrieve estimates.' });
+  }
+});
+
 module.exports = router;
