@@ -593,7 +593,6 @@ header {
 }
 
 /* ===== 7. BLOG ===== */
-.blog-grid { gap: 30px; }
 .blog-card { text-align: left; }
 .blog-card h4 { margin: 10px 0; }
 
