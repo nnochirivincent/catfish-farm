@@ -6,12 +6,97 @@ const API_BASE_URL = 'https://victory-backend-vt8k.onrender.com';
 
 // Wait for DOM to load fully
 document.addEventListener('DOMContentLoaded', () => {
+  initHeroSlider();
+  initTestimonials();
   initFeedCalculator();
   initProfitabilityEstimator();
   initMobileMenu();
   loadProductsFromBackend();
   initCheckoutModal();
 });
+
+// ===== 0. HERO SLIDER =====
+function initHeroSlider() {
+  const slides = document.querySelectorAll('.hero-slider .slide');
+  const dots = document.querySelectorAll('.hero-slider .dot');
+  const prevBtn = document.getElementById('prevSlide');
+  const nextBtn = document.getElementById('nextSlide');
+
+  if (slides.length === 0) return;
+
+  let currentSlide = 0;
+  let slideInterval;
+
+  function showSlide(index) {
+    slides.forEach((slide, i) => {
+      slide.classList.toggle('active', i === index);
+    });
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === index);
+    });
+    currentSlide = index;
+  }
+
+  function nextSlide() {
+    let nextIndex = (currentSlide + 1) % slides.length;
+    showSlide(nextIndex);
+  }
+
+  function prevSlide() {
+    let prevIndex = (currentSlide - 1 + slides.length) % slides.length;
+    showSlide(prevIndex);
+  }
+
+  function startAutoPlay() {
+    stopAutoPlay();
+    slideInterval = setInterval(nextSlide, 5000);
+  }
+
+  function stopAutoPlay() {
+    if (slideInterval) clearInterval(slideInterval);
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      nextSlide();
+      startAutoPlay();
+    });
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      prevSlide();
+      startAutoPlay();
+    });
+  }
+
+  dots.forEach((dot, idx) => {
+    dot.addEventListener('click', () => {
+      showSlide(idx);
+      startAutoPlay();
+    });
+  });
+
+  startAutoPlay();
+}
+
+// ===== 0.1 TESTIMONIALS TOGGLE =====
+function initTestimonials() {
+  const seeMoreBtn = document.getElementById('seeMoreBtn');
+  if (!seeMoreBtn) return;
+
+  seeMoreBtn.addEventListener('click', () => {
+    const hiddenTestimonials = document.querySelectorAll('.hidden-testimonial');
+    let isShowing = false;
+
+    hiddenTestimonials.forEach(card => {
+      card.classList.toggle('show');
+      if (card.classList.contains('show')) isShowing = true;
+    });
+
+    seeMoreBtn.textContent = isShowing ? "Show Less Testimonials ↑" : "See More Testimonials ↓";
+  });
+}
 
 // ===== 1. SMART FEED CALCULATOR =====
 function initFeedCalculator() {
@@ -27,7 +112,6 @@ function initFeedCalculator() {
       return;
     }
 
-    // Determine stage & feeding rate based on average weight (grams)
     let feedingRatePercent = 2.5;
     let pelletSize = '3.0mm';
     let schedule = '2 times daily';
@@ -54,13 +138,11 @@ function initFeedCalculator() {
       schedule = '1 - 2 times daily';
     }
 
-    // Calculations
     const totalBiomassKg = (totalFish * avgWeight) / 1000;
     const dailyFeedKg = (totalBiomassKg * feedingRatePercent) / 100;
     const monthlyFeedKg = dailyFeedKg * 30;
     const bags30Days = Math.ceil(monthlyFeedKg / 15);
 
-    // Update HTML Outputs
     const setTxt = (id, txt) => {
       const el = document.getElementById(id);
       if (el) el.textContent = txt;
@@ -74,8 +156,6 @@ function initFeedCalculator() {
 
     const resultsCard = document.getElementById('calc-results');
     if (resultsCard) {
-      // Remove inline display style to allow CSS class rules to govern layout
-      resultsCard.style.display = '';
       resultsCard.classList.remove('hidden');
     }
   });
@@ -182,7 +262,7 @@ async function loadProductsFromBackend() {
 function renderProducts(products, container) {
   container.innerHTML = '';
   if (!products || products.length === 0) {
-    container.innerHTML = `<p style="text-align: center;">No products available at the moment.</p>`;
+    container.innerHTML = `<p style="text-align: center; grid-column: 1/-1;">No products available at the moment.</p>`;
     return;
   }
 
@@ -195,7 +275,7 @@ function renderProducts(products, container) {
         <h3>${product.name}</h3>
         <p class="desc">${product.description || ''}</p>
         <span class="price">₦${product.price.toLocaleString()}</span>
-        <button class="btn btn-primary" onclick="addToCart('${product._id}', '${product.name}', ${product.price}, '${product.image}')">
+        <button class="btn btn-primary" onclick="addToCart('${product._id}', '${product.name.replace(/'/g, "\\'")}', ${product.price}, '${product.image}')">
           Add to Cart
         </button>
       </div>
@@ -206,7 +286,7 @@ function renderProducts(products, container) {
 
 // ===== 5. SHOPPING CART MANAGEMENT =====
 window.addToCart = function(id, name, price, image) {
-  const existingIndex = cart.findIndex(item => item.id === id);
+  const existingIndex = cart.findIndex(item => String(item.id) === String(id));
   if (existingIndex > -1) {
     cart[existingIndex].quantity += 1;
   } else {
@@ -217,12 +297,12 @@ window.addToCart = function(id, name, price, image) {
 };
 
 window.removeFromCart = function(id) {
-  cart = cart.filter(item => item.id !== id);
+  cart = cart.filter(item => String(item.id) !== String(id));
   updateCartUI();
 };
 
 window.updateQuantity = function(id, change) {
-  const item = cart.find(item => item.id === id);
+  const item = cart.find(item => String(item.id) === String(id));
   if (!item) return;
 
   item.quantity += change;
@@ -237,12 +317,13 @@ function updateCartUI() {
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
   const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
-  // Update Header Badge
   const cartBadge = document.getElementById('cart-count');
   if (cartBadge) cartBadge.textContent = totalItems;
 
-  // Update Sticky Cart Bar
-  const cartBar = document.querySelector('.vc-cart-bar');
+  const floatCartCount = document.getElementById('float-cart-count');
+  if (floatCartCount) floatCartCount.textContent = totalItems;
+
+  const cartBar = document.getElementById('cartBar');
   const cartBarText = document.getElementById('vc-cart-summary');
   if (cartBar) {
     if (totalItems > 0) {
@@ -255,14 +336,32 @@ function updateCartUI() {
     }
   }
 
-  // Floating Checkout Button visibility
   const floatBtn = document.getElementById('floatingCheckoutBtn');
   if (floatBtn) {
     floatBtn.style.display = totalItems > 0 ? 'block' : 'none';
   }
+
+  const finalAmountEl = document.getElementById('finalAmount');
+  if (finalAmountEl) {
+    finalAmountEl.textContent = totalPrice.toLocaleString();
+  }
 }
 
-// ===== 6. CHECKOUT MODAL =====
+// ===== 6. CHECKOUT MODAL CONTROLS =====
+window.openCheckoutModal = function() {
+  if (cart.length === 0) {
+    alert("Your cart is empty. Add items before checking out.");
+    return;
+  }
+  const modal = document.getElementById('checkoutModal');
+  if (modal) modal.style.display = 'flex';
+};
+
+window.closeCheckoutModal = function() {
+  const modal = document.getElementById('checkoutModal');
+  if (modal) modal.style.display = 'none';
+};
+
 function initCheckoutModal() {
   const checkoutForm = document.getElementById('checkoutForm');
   if (checkoutForm) {
@@ -286,6 +385,9 @@ function initCheckoutModal() {
       const totalAmount = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
       try {
+        const payBtn = document.getElementById('payNowBtn');
+        if (payBtn) payBtn.textContent = "Processing...";
+
         const response = await fetch(`${API_BASE_URL}/api/payment/initialize`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -300,6 +402,9 @@ function initCheckoutModal() {
         }
       } catch (err) {
         alert("Payment Error: " + err.message);
+      } finally {
+        const payBtn = document.getElementById('payNowBtn');
+        if (payBtn) payBtn.innerHTML = `Pay Now ₦<span id="finalAmount">${totalAmount.toLocaleString()}</span>`;
       }
     });
   }
