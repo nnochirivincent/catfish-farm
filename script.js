@@ -592,3 +592,69 @@ function renderBatchCards(batches, container) {
 document.addEventListener('DOMContentLoaded', () => {
   loadBatchTrackerData();
 });
+
+// ===== TRACEABILITY & QUALITY VERIFICATION SYSTEM =====
+async function verifyBatchCode() {
+  const inputField = document.getElementById('traceability-search-input');
+  const resultContainer = document.getElementById('traceability-result-container');
+
+  if (!inputField || !resultContainer) return;
+
+  const code = inputField.value.trim().toUpperCase();
+  if (!code) {
+    resultContainer.innerHTML = `<p style="text-align: center; color: #e74c3c;">Please enter a batch code to verify.</p>`;
+    return;
+  }
+
+  resultContainer.innerHTML = `<p style="text-align: center; color: #3498db;">Fetching traceability records for <b>${code}</b>...</p>`;
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/traceability/${code}`);
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      resultContainer.innerHTML = `
+        <div style="background: #fde8e8; color: #c81e1e; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #f8b4b4;">
+          <b>Verification Failed:</b> ${result.message || 'No matching quality record found.'}
+        </div>`;
+      return;
+    }
+
+    const data = result.data;
+    const hatch = new Date(data.hatchDate).toLocaleDateString();
+    const harvest = new Date(data.harvestDate).toLocaleDateString();
+
+    resultContainer.innerHTML = `
+      <div style="background: #ffffff; border: 2px solid #27ae60; border-radius: 10px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 12px; margin-bottom: 15px;">
+          <h3 style="margin: 0; color: #2c3e50;">Batch: ${data.batchCode}</h3>
+          <span style="background: #27ae60; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold;">
+            ✓ VERIFIED AUTHENTIC
+          </span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 0.95rem; color: #444;">
+          <div><b>Pond Origin:</b> ${data.pondIdentifier}</div>
+          <div><b>Species:</b> ${data.species}</div>
+          <div><b>Hatch Date:</b> ${hatch}</div>
+          <div><b>Harvest Date:</b> ${harvest}</div>
+          <div><b>Feed Grade:</b> ${data.feedTypeUsed}</div>
+          <div><b>Harvest Biomass:</b> ${data.harvestWeightKg} kg</div>
+          <div><b>Water Quality:</b> <span style="color: #27ae60; font-weight: bold;">${data.waterQualityStatus}</span></div>
+          <div><b>Organic Certified:</b> ${data.organicCertified ? 'Yes ✅' : 'No ❌'}</div>
+          <div><b>Vet Inspection:</b> ${data.veterinaryInspectionPassed ? 'PASSED ✅' : 'FAILED ❌'}</div>
+        </div>
+
+        <div style="margin-top: 15px; background: #f8f9fa; padding: 12px; border-radius: 6px; font-size: 0.88rem; color: #555;">
+          <b>Quality Officer Notes:</b> ${data.notes}
+        </div>
+      </div>
+    `;
+  } catch (error) {
+    console.error("Traceability verification error:", error);
+    resultContainer.innerHTML = `
+      <div style="background: #fde8e8; color: #c81e1e; padding: 15px; border-radius: 8px; text-align: center;">
+        Unable to complete verification right now. Please check your backend connection.
+      </div>`;
+  }
+}
