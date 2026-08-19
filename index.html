@@ -35,7 +35,7 @@
       <!-- CTA BUTTONS -->
       <div class="header-actions">
         <a href="https://wa.me/2348034732228" class="btn-whatsapp-small" target="_blank">💬 WhatsApp</a>
-        <button class="hamburger" id="hamburger">☰</button>
+        <button class="hamburger" id="hamburger" aria-label="Toggle navigation">☰</button>
       </div>
 
     </div>
@@ -92,8 +92,8 @@
     </div>
 
     <!-- ARROWS -->
-    <button class="slider-arrow prev">❮</button>
-    <button class="slider-arrow next">❯</button>
+    <button class="slider-arrow prev" id="prevSlide">❮</button>
+    <button class="slider-arrow next" id="nextSlide">❯</button>
   </section>
 
   <!-- ===== PRODUCT SIZES SECTION ===== -->
@@ -105,21 +105,21 @@
         <h4>Live Catfish</h4>
         <p>Fresh Clarias Gariepinus. Available: 1kg, 2kg, 5kg, 10kg+</p>
         <p class="price">From ₦3,500/kg</p>
-        <button onclick="addToCart(1, 'Live Catfish (1kg)', 3500, './assets/images/live-catfish.jpeg')" class="btn btn-primary">Add to Cart</button>
+        <button onclick="addToCart('live-1kg', 'Live Catfish (1kg)', 3500, './assets/images/live-catfish.jpeg')" class="btn btn-primary">Add to Cart</button>
       </div>
       <div class="size-card">
         <img src="./assets/images/smoked-catfish.jpeg" alt="Dried Smoked Catfish">
         <h4>Smoked Catfish</h4>
         <p>Oven dried catfish. Perfect for stew and pepper soup</p>
         <p class="price">From ₦5,000/pack</p>
-        <button onclick="addToCart(3, 'Oven-Smoked Catfish (Pack of 4)', 5000, './assets/images/smoked-catfish.jpeg')" class="btn btn-primary">Add to Cart</button>
+        <button onclick="addToCart('smoked-pack-4', 'Oven-Smoked Catfish (Pack of 4)', 5000, './assets/images/smoked-catfish.jpeg')" class="btn btn-primary">Add to Cart</button>
       </div>
       <div class="size-card">
         <img src="./assets/images/3rd-image.jpeg" alt="Catfish Fingerlings">
         <h4>Fingerlings</h4>
         <p>3-4 weeks old healthy catfish juveniles for your farm</p>
         <p class="price">₦8,000/100pcs</p>
-        <button onclick="addToCart(5, 'Catfish Fingerlings (100pcs)', 8000, './assets/images/3rd-image.jpeg')" class="btn btn-primary">Add to Cart</button>
+        <button onclick="addToCart('fingerlings-100pcs', 'Catfish Fingerlings (100pcs)', 8000, './assets/images/3rd-image.jpeg')" class="btn btn-primary">Add to Cart</button>
       </div>
     </div>
   </section>
@@ -247,7 +247,7 @@
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px;">
         <!-- INPUT FORM -->
         <div style="background: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
-          <h3 style="font-size: 1.3rem; margin-bottom: 20px; color: #1e293b;">1. Input Batch Parameters</h3>
+          <h3 style="font-size: 1.3rem; margin-bottom: 20px; color: #1e293b; text-align: left;">1. Input Batch Parameters</h3>
           
           <div style="margin-bottom: 15px;">
             <label style="display: block; font-weight: 600; margin-bottom: 5px;">Total Fish Stocked (Quantity)</label>
@@ -292,7 +292,7 @@
         <!-- RESULTS DASHBOARD -->
         <div id="profit-results" style="background: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: space-between;">
           <div>
-            <h3 style="font-size: 1.3rem; margin-bottom: 20px; color: #1e293b;">2. Estimated Financial Summary</h3>
+            <h3 style="font-size: 1.3rem; margin-bottom: 20px; color: #1e293b; text-align: left;">2. Estimated Financial Summary</h3>
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
               <div style="background: #f1f5f9; padding: 12px; border-radius: 8px;">
@@ -432,20 +432,27 @@
     </div>
   </section>
 
+  <!-- STICKY CART BAR & FLOATING CHECKOUT -->
+  <div class="vc-cart-bar" id="cartBar">
+    <span id="vc-cart-summary">0 item(s) selected - Total: ₦0</span>
+    <button class="vc-cart-bar-btn" onclick="openCheckoutModal()">Proceed to Checkout 🛍️</button>
+  </div>
+  <a href="javascript:void(0)" id="floatingCheckoutBtn" onclick="openCheckoutModal()">🛒 Checkout (<span id="float-cart-count">0</span>)</a>
+
   <!-- CHECKOUT MODAL -->
-  <div id="checkoutModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center;">
-    <div style="background:white; padding:20px; border-radius:10px; width:90%; max-width:400px;">
-      <h2>Complete Your Order</h2>
+  <div id="checkoutModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; z-index: 10000;">
+    <div style="background:white; padding:25px; border-radius:12px; width:90%; max-width:420px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+      <h2 style="margin-bottom: 15px; color: #0f172a; font-size: 1.5rem;">Complete Your Order</h2>
       <form id="checkoutForm">
-        <input id="customerName" type="text" placeholder="Full Name" required style="width:100%; padding:10px; margin:8px 0;"><br>
-        <input id="customerEmail" type="email" placeholder="Email" required style="width:100%; padding:10px; margin:8px 0;"><br>
-        <input id="customerPhone" type="tel" placeholder="Phone Number" required style="width:100%; padding:10px; margin:8px 0;"><br>
-        <textarea id="customerAddress" placeholder="Delivery Address" required style="width:100%; padding:10px; margin:8px 0;"></textarea><br>
+        <input id="customerName" type="text" placeholder="Full Name" required style="width:100%; padding:10px; margin:8px 0; border:1px solid #cbd5e1; border-radius:6px;"><br>
+        <input id="customerEmail" type="email" placeholder="Email Address" required style="width:100%; padding:10px; margin:8px 0; border:1px solid #cbd5e1; border-radius:6px;"><br>
+        <input id="customerPhone" type="tel" placeholder="Phone Number" required style="width:100%; padding:10px; margin:8px 0; border:1px solid #cbd5e1; border-radius:6px;"><br>
+        <textarea id="customerAddress" placeholder="Delivery Address in Lagos" required style="width:100%; padding:10px; margin:8px 0; border:1px solid #cbd5e1; border-radius:6px; min-height:80px;"></textarea><br>
         
-        <button type="submit" id="payNowBtn" style="background:#2ecc71; color:white; padding:12px; border:none; width:100%; border-radius:8px;">
+        <button type="submit" id="payNowBtn" style="background:#2ecc71; color:white; padding:12px; border:none; width:100%; border-radius:8px; font-weight:700; font-size:1rem; cursor:pointer; margin-top:10px;">
           Pay Now ₦<span id="finalAmount">0</span>
         </button>
-        <button type="button" onclick="document.getElementById('checkoutModal').style.display='none'" style="background:#ccc; color:black; padding:12px; border:none; width:100%; border-radius:8px; margin-top:8px;">
+        <button type="button" onclick="closeCheckoutModal()" style="background:#e2e8f0; color:#334155; padding:12px; border:none; width:100%; border-radius:8px; font-weight:600; cursor:pointer; margin-top:8px;">
           Cancel
         </button>
       </form>
