@@ -21,7 +21,6 @@ function initFeedCalculator() {
   calculateBtn.addEventListener('click', () => {
     const totalFish = parseFloat(document.getElementById('stock-count')?.value);
     const avgWeight = parseFloat(document.getElementById('avg-weight')?.value);
-    const species = document.getElementById('species')?.value;
 
     if (!totalFish || !avgWeight || totalFish <= 0 || avgWeight <= 0) {
       alert("Please enter valid positive numbers for total fish and average weight.");
@@ -75,8 +74,9 @@ function initFeedCalculator() {
 
     const resultsCard = document.getElementById('calc-results');
     if (resultsCard) {
+      // Remove inline display style to allow CSS class rules to govern layout
+      resultsCard.style.display = '';
       resultsCard.classList.remove('hidden');
-      resultsCard.style.display = 'block';
     }
   });
 }
@@ -121,7 +121,6 @@ function initProfitabilityEstimator() {
 
       const m = resData.data;
 
-      // Safe Element Assigner
       const setTxt = (id, val) => {
         const el = document.getElementById(id);
         if (el) el.textContent = val;
@@ -192,15 +191,13 @@ function renderProducts(products, container) {
     card.className = 'product-card';
     card.innerHTML = `
       <img src="${product.image || 'https://via.placeholder.com/300x200'}" alt="${product.name}">
-      <div class="product-info">
+      <div class="product-card-content">
         <h3>${product.name}</h3>
-        <p class="description">${product.description || ''}</p>
-        <div class="product-bottom">
-          <span class="price">₦${product.price.toLocaleString()}</span>
-          <button class="add-to-cart-btn" onclick="addToCart('${product._id}', '${product.name}', ${product.price}, '${product.image}')">
-            Add to Cart
-          </button>
-        </div>
+        <p class="desc">${product.description || ''}</p>
+        <span class="price">₦${product.price.toLocaleString()}</span>
+        <button class="btn btn-primary" onclick="addToCart('${product._id}', '${product.name}', ${product.price}, '${product.image}')">
+          Add to Cart
+        </button>
       </div>
     `;
     container.appendChild(card);
@@ -208,7 +205,7 @@ function renderProducts(products, container) {
 }
 
 // ===== 5. SHOPPING CART MANAGEMENT =====
-function addToCart(id, name, price, image) {
+window.addToCart = function(id, name, price, image) {
   const existingIndex = cart.findIndex(item => item.id === id);
   if (existingIndex > -1) {
     cart[existingIndex].quantity += 1;
@@ -217,29 +214,52 @@ function addToCart(id, name, price, image) {
   }
   updateCartUI();
   alert(`${name} added to cart!`);
-}
+};
 
-function removeFromCart(id) {
+window.removeFromCart = function(id) {
   cart = cart.filter(item => item.id !== id);
   updateCartUI();
-}
+};
 
-function updateQuantity(id, change) {
+window.updateQuantity = function(id, change) {
   const item = cart.find(item => item.id === id);
   if (!item) return;
 
   item.quantity += change;
   if (item.quantity <= 0) {
-    removeFromCart(id);
+    window.removeFromCart(id);
   } else {
     updateCartUI();
   }
-}
+};
 
 function updateCartUI() {
-  const cartBadge = document.getElementById('cart-count');
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+  // Update Header Badge
+  const cartBadge = document.getElementById('cart-count');
   if (cartBadge) cartBadge.textContent = totalItems;
+
+  // Update Sticky Cart Bar
+  const cartBar = document.querySelector('.vc-cart-bar');
+  const cartBarText = document.getElementById('vc-cart-summary');
+  if (cartBar) {
+    if (totalItems > 0) {
+      cartBar.style.display = 'flex';
+      if (cartBarText) {
+        cartBarText.textContent = `${totalItems} item(s) selected - Total: ₦${totalPrice.toLocaleString()}`;
+      }
+    } else {
+      cartBar.style.display = 'none';
+    }
+  }
+
+  // Floating Checkout Button visibility
+  const floatBtn = document.getElementById('floatingCheckoutBtn');
+  if (floatBtn) {
+    floatBtn.style.display = totalItems > 0 ? 'block' : 'none';
+  }
 }
 
 // ===== 6. CHECKOUT MODAL =====
@@ -248,6 +268,11 @@ function initCheckoutModal() {
   if (checkoutForm) {
     checkoutForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+
+      if (cart.length === 0) {
+        alert("Your cart is empty.");
+        return;
+      }
 
       const name = document.getElementById('customerName')?.value;
       const email = document.getElementById('customerEmail')?.value;
