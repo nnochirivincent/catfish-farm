@@ -19,11 +19,13 @@ app.use(express.json());
 const productRoutes = require('./routes/product');
 const paymentRoutes = require('./routes/payment');
 const estimatorRoutes = require('./routes/estimator');
+const batchRoutes = require('./routes/batch');
 
 // Mount routes
 app.use('/api', productRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/estimator', estimatorRoutes);
+app.use('/api/batch', batchRoutes);
 
 // Root route
 app.get('/', (req, res) => {
