@@ -1,12 +1,12 @@
-require('dotenv').config(); // FIXED: lowercase 'r'
+require('dotenv').config();
 const express = require('express');
 const router = express.Router();
-const Order = require('../models/order'); // Fixed capital 'O'
+const Order = require('../models/order');
 const axios = require('axios');
 
 const PAYSTACK_SECRET = process.env.PAYSTACK_SECRET_KEY;
 
-// 1. CREATE ORDER ROUTE
+// 1. CREATE ORDER ROUTE -> POST /api/payment/order
 router.post('/order', async (req, res) => {
   try {
     const { name, email, phone, address, items, totalAmount } = req.body;
@@ -37,24 +37,31 @@ router.post('/order', async (req, res) => {
     });
 
   } catch (err) {
-    console.log("Order Creation Error:", err.message);
+    console.error("Order Creation Error:", err.message);
     res.status(400).json({ success: false, message: err.message });
   }
 });
 
-// 2. INITIALIZE PAYSTACK PAYMENT ROUTE
-router.post('/pay', async (req, res) => {
+// Paystack Handler Logic
+const handlePaystackInit = async (req, res) => {
   try {
-    const { email, amount, orderId } = req.body;
-    
-    // Fetch URL from Render
+    const { email, amount, orderId, customerName, phone } = req.body;
+
+    if (!email || !amount) {
+      return res.status(400).json({
+        status: false,
+        message: "Email and amount are required for payment initialization."
+      });
+    }
+
     let frontendUrl = process.env.FRONTEND_URL || 'https://nnochirivincent.github.io/catfish-farm';
     
-    // SAFETY NET: If the Render variable accidentally contains markdown brackets, ignore it and use the clean link
     if (frontendUrl.includes('](')) {
        frontendUrl = 'https://nnochirivincent.github.io/catfish-farm';
     }
 
+    // Clean up base URL formatting
+    frontendUrl = frontendUrl.replace(/\/+$/, '');
     const callbackUrl = `${frontendUrl}/payment-success.html`;
 
     const response = await axios.post(
@@ -62,7 +69,11 @@ router.post('/pay', async (req, res) => {
       { 
         email, 
         amount: Math.round(Number(amount) * 100), // Convert Naira to Kobo
-        metadata: { orderId }, 
+        metadata: { 
+          orderId: orderId || null,
+          customerName: customerName || '',
+          phone: phone || ''
+        }, 
         callback_url: callbackUrl
       },
       { 
@@ -75,12 +86,18 @@ router.post('/pay', async (req, res) => {
 
     res.json(response.data);
   } catch (err) {
-    console.log("Paystack Init Error:", err.response?.data || err.message);
+    console.error("Paystack Init Error:", err.response?.data || err.message);
     res.status(500).json({ 
       status: false, 
       message: err.response?.data?.message || err.message 
     });
   }
-});
+};
+
+// 2. INITIALIZE PAYSTACK ROUTE ALIASES
+// Handles POST /api/payment, /api/payment/pay, and /api/payment/initialize
+router.post('/pay', handlePaystackInit);
+router.post('/initialize', handlePaystackInit);
+router.post('/', handlePaystackInit);
 
 module.exports = router;
