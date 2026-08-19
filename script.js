@@ -1,5 +1,5 @@
-// Global Cart Array
-let cart = [];
+// ===== GLOBAL CART ARRAY WITH LOCALSTORAGE =====
+let cart = JSON.parse(localStorage.getItem('victory_catfish_cart')) || [];
 
 // Base API URL
 const API_BASE_URL = 'https://victory-backend-vt8k.onrender.com';
@@ -12,8 +12,15 @@ document.addEventListener('DOMContentLoaded', () => {
   initProfitabilityEstimator();
   initMobileMenu();
   loadProductsFromBackend();
+  renderCartPage();  // Renders cart items if on cart.html
+  updateCartUI();    // Syncs badge counts across all pages
   initCheckoutModal();
 });
+
+// Helper: Save cart to browser storage
+function saveCart() {
+  localStorage.setItem('victory_catfish_cart', JSON.stringify(cart));
+}
 
 // ===== 0. HERO SLIDER =====
 function initHeroSlider() {
@@ -28,12 +35,8 @@ function initHeroSlider() {
   let slideInterval;
 
   function showSlide(index) {
-    slides.forEach((slide, i) => {
-      slide.classList.toggle('active', i === index);
-    });
-    dots.forEach((dot, i) => {
-      dot.classList.toggle('active', i === index);
-    });
+    slides.forEach((slide, i) => slide.classList.toggle('active', i === index));
+    dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
     currentSlide = index;
   }
 
@@ -155,9 +158,7 @@ function initFeedCalculator() {
     setTxt('res-monthly-bags', `${bags30Days} Bags (${monthlyFeedKg.toFixed(1)} kg)`);
 
     const resultsCard = document.getElementById('calc-results');
-    if (resultsCard) {
-      resultsCard.classList.remove('hidden');
-    }
+    if (resultsCard) resultsCard.classList.remove('hidden');
   });
 }
 
@@ -215,9 +216,7 @@ function initProfitabilityEstimator() {
       setTxt('res-roi', `${m.roiPercent}%`);
       setTxt('res-margin', `${m.profitMarginPercent}%`);
 
-      if (save) {
-        alert("Batch estimate saved successfully to database! 🚀");
-      }
+      if (save) alert("Batch estimate saved successfully to database! 🚀");
 
     } catch (err) {
       console.error("Estimator error:", err);
@@ -237,15 +236,14 @@ function initMobileMenu() {
   const navbar = document.getElementById('navbar');
 
   if (hamburger && navbar) {
-    hamburger.addEventListener('click', () => {
-      navbar.classList.toggle('active');
-    });
+    hamburger.addEventListener('click', () => navbar.classList.toggle('active'));
   }
 }
 
 // ===== 4. LOAD PRODUCTS FROM BACKEND =====
 async function loadProductsFromBackend() {
-  const container = document.getElementById('products-grid');
+  // Checks for product-list OR products-grid to cover both page variants
+  const container = document.getElementById('product-list') || document.getElementById('products-grid');
   if (!container) return;
 
   try {
@@ -256,6 +254,7 @@ async function loadProductsFromBackend() {
     renderProducts(products, container);
   } catch (error) {
     console.error('Error fetching products:', error);
+    container.innerHTML = `<p style="text-align: center; grid-column: 1/-1;">Unable to load products. Please refresh.</p>`;
   }
 }
 
@@ -274,8 +273,8 @@ function renderProducts(products, container) {
       <div class="product-card-content">
         <h3>${product.name}</h3>
         <p class="desc">${product.description || ''}</p>
-        <span class="price">₦${product.price.toLocaleString()}</span>
-        <button class="btn btn-primary" onclick="addToCart('${product._id}', '${product.name.replace(/'/g, "\\'")}', ${product.price}, '${product.image}')">
+        <span class="price">₦${Number(product.price).toLocaleString()}</span>
+        <button class="btn btn-primary" onclick="addToCart('${product._id}', '${product.name.replace(/'/g, "\\'")}', ${product.price}, '${product.image || ''}')">
           Add to Cart
         </button>
       </div>
@@ -290,15 +289,19 @@ window.addToCart = function(id, name, price, image) {
   if (existingIndex > -1) {
     cart[existingIndex].quantity += 1;
   } else {
-    cart.push({ id, name, price, image, quantity: 1 });
+    cart.push({ id, name, price: Number(price), image, quantity: 1 });
   }
+  saveCart();
   updateCartUI();
+  renderCartPage();
   alert(`${name} added to cart!`);
 };
 
 window.removeFromCart = function(id) {
   cart = cart.filter(item => String(item.id) !== String(id));
+  saveCart();
   updateCartUI();
+  renderCartPage();
 };
 
 window.updateQuantity = function(id, change) {
@@ -309,7 +312,9 @@ window.updateQuantity = function(id, change) {
   if (item.quantity <= 0) {
     window.removeFromCart(id);
   } else {
+    saveCart();
     updateCartUI();
+    renderCartPage();
   }
 };
 
@@ -337,17 +342,69 @@ function updateCartUI() {
   }
 
   const floatBtn = document.getElementById('floatingCheckoutBtn');
-  if (floatBtn) {
-    floatBtn.style.display = totalItems > 0 ? 'block' : 'none';
-  }
+  if (floatBtn) floatBtn.style.display = totalItems > 0 ? 'block' : 'none';
 
   const finalAmountEl = document.getElementById('finalAmount');
-  if (finalAmountEl) {
-    finalAmountEl.textContent = totalPrice.toLocaleString();
-  }
+  if (finalAmountEl) finalAmountEl.textContent = totalPrice.toLocaleString();
 }
 
-// ===== 6. CHECKOUT MODAL CONTROLS =====
+// ===== 6. RENDER CART PAGE (cart.html) =====
+function renderCartPage() {
+  const cartItemsContainer = document.getElementById('cart-items');
+  const emptyCartDiv = document.getElementById('empty-cart');
+  const cartSummaryDiv = document.getElementById('cart-summary');
+  const subtotalEl = document.getElementById('subtotal');
+  const totalEl = document.getElementById('total');
+
+  if (!cartItemsContainer) return;
+
+  if (cart.length === 0) {
+    if (emptyCartDiv) emptyCartDiv.style.display = 'block';
+    if (cartSummaryDiv) cartSummaryDiv.style.display = 'none';
+    cartItemsContainer.innerHTML = '';
+    return;
+  }
+
+  if (emptyCartDiv) emptyCartDiv.style.display = 'none';
+  if (cartSummaryDiv) cartSummaryDiv.style.display = 'block';
+
+  cartItemsContainer.innerHTML = '';
+  let subtotal = 0;
+
+  cart.forEach(item => {
+    const itemTotal = item.price * item.quantity;
+    subtotal += itemTotal;
+
+    const row = document.createElement('div');
+    row.className = 'cart-item';
+    row.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #eee;';
+    row.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <img src="${item.image || 'https://via.placeholder.com/80'}" alt="${item.name}" style="width: 70px; height: 70px; object-fit: cover; border-radius: 8px;">
+        <div>
+          <h4 style="margin: 0 0 5px 0;">${item.name}</h4>
+          <p style="margin: 0; color: #666; font-size: 0.9rem;">₦${item.price.toLocaleString()} each</p>
+          <div style="display: flex; align-items: center; gap: 8px; margin-top: 8px;">
+            <button onclick="updateQuantity('${item.id}', -1)" style="padding: 2px 8px; cursor: pointer; border: 1px solid #ccc; background: #f8f8f8; border-radius: 4px;">-</button>
+            <span><b>${item.quantity}</b></span>
+            <button onclick="updateQuantity('${item.id}', 1)" style="padding: 2px 8px; cursor: pointer; border: 1px solid #ccc; background: #f8f8f8; border-radius: 4px;">+</button>
+          </div>
+        </div>
+      </div>
+      <div style="text-align: right;">
+        <p style="font-weight: bold; color: #27ae60; margin: 0 0 8px 0;">₦${itemTotal.toLocaleString()}</p>
+        <button onclick="removeFromCart('${item.id}')" style="background: none; border: none; color: #e74c3c; cursor: pointer; text-decoration: underline; font-size: 0.85rem;">Remove</button>
+      </div>
+    `;
+    cartItemsContainer.appendChild(row);
+  });
+
+  const deliveryFee = 2000;
+  if (subtotalEl) subtotalEl.textContent = `₦${subtotal.toLocaleString()}`;
+  if (totalEl) totalEl.textContent = `₦${(subtotal + deliveryFee).toLocaleString()}`;
+}
+
+// ===== 7. CHECKOUT MODAL & PAYSTACK CONTROLS =====
 window.openCheckoutModal = function() {
   if (cart.length === 0) {
     alert("Your cart is empty. Add items before checking out.");
@@ -363,6 +420,29 @@ window.closeCheckoutModal = function() {
 };
 
 function initCheckoutModal() {
+  const checkoutBtn = document.getElementById('checkoutBtn');
+  if (checkoutBtn) {
+    checkoutBtn.addEventListener('click', openCheckoutModal);
+  }
+
+  const whatsappCheckoutBtn = document.getElementById('whatsappCheckoutBtn');
+  if (whatsappCheckoutBtn) {
+    whatsappCheckoutBtn.addEventListener('click', () => {
+      if (cart.length === 0) {
+        alert("Your cart is empty!");
+        return;
+      }
+      let message = "Hello Victory Catfish Farm, I want to order:\n\n";
+      let total = 0;
+      cart.forEach(item => {
+        message += `• ${item.name} (${item.quantity}x) - ₦${(item.price * item.quantity).toLocaleString()}\n`;
+        total += item.price * item.quantity;
+      });
+      message += `\nSubtotal: ₦${total.toLocaleString()}\nDelivery: ₦2,000\nTotal: ₦${(total + 2000).toLocaleString()}`;
+      window.open(`https://wa.me/2348034732228?text=${encodeURIComponent(message)}`, '_blank');
+    });
+  }
+
   const checkoutForm = document.getElementById('checkoutForm');
   if (checkoutForm) {
     checkoutForm.addEventListener('submit', async (e) => {
@@ -382,7 +462,7 @@ function initCheckoutModal() {
         return;
       }
 
-      const totalAmount = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      const totalAmount = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) + 2000;
 
       try {
         const payBtn = document.getElementById('payNowBtn');
