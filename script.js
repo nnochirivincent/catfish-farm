@@ -195,6 +195,11 @@ function initProfitabilityEstimator() {
         body: JSON.stringify({ ...inputs, saveCalculation: save })
       });
 
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error(`Server returned HTML error (${response.status}). Check backend service.`);
+      }
+
       const resData = await response.json();
       if (!response.ok || !resData.success) {
         throw new Error(resData.message || 'Calculation failed on backend');
@@ -242,13 +247,16 @@ function initMobileMenu() {
 
 // ===== 4. LOAD PRODUCTS FROM BACKEND =====
 async function loadProductsFromBackend() {
-  // Checks for product-list OR products-grid to cover both page variants
   const container = document.getElementById('product-list') || document.getElementById('products-grid');
   if (!container) return;
 
   try {
     const response = await fetch(`${API_BASE_URL}/api/products`);
-    if (!response.ok) throw new Error('Failed to fetch products');
+    const contentType = response.headers.get("content-type");
+    
+    if (!response.ok || !contentType || !contentType.includes("application/json")) {
+      throw new Error(`Failed to fetch products (Status: ${response.status})`);
+    }
 
     const products = await response.json();
     renderProducts(products, container);
@@ -463,27 +471,45 @@ function initCheckoutModal() {
       }
 
       const totalAmount = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) + 2000;
+      const payBtn = document.getElementById('payNowBtn');
 
       try {
-        const payBtn = document.getElementById('payNowBtn');
         if (payBtn) payBtn.textContent = "Processing...";
 
-        const response = await fetch(`${API_BASE_URL}/api/payment/initialize`, {
+        // Try primary payment initialize endpoint
+        let response = await fetch(`${API_BASE_URL}/api/payment/initialize`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, amount: totalAmount, customerName: name, phone, cart })
         });
 
+        // Fallback to /api/checkout if payment route returns 404
+        if (response.status === 404) {
+          response = await fetch(`${API_BASE_URL}/api/checkout`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, amount: totalAmount, customerName: name, phone, cart })
+          });
+        }
+
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          throw new Error(`Server payment route not found or sleeping (${response.status}). Check backend status on Render.`);
+        }
+
         const data = await response.json();
-        if (data.status && data.data.authorization_url) {
+        
+        if (data.status && data.data?.authorization_url) {
           window.location.href = data.data.authorization_url;
+        } else if (data.authorization_url) {
+          window.location.href = data.authorization_url;
         } else {
-          alert("Payment initialization failed: " + (data.message || "Unknown error"));
+          alert("Payment initialization response: " + (data.message || "Endpoint returned without authorization URL"));
         }
       } catch (err) {
+        console.error("Checkout error:", err);
         alert("Payment Error: " + err.message);
       } finally {
-        const payBtn = document.getElementById('payNowBtn');
         if (payBtn) payBtn.innerHTML = `Pay Now ₦<span id="finalAmount">${totalAmount.toLocaleString()}</span>`;
       }
     });
