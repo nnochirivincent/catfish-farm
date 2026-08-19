@@ -515,3 +515,80 @@ function initCheckoutModal() {
     });
   }
 }
+
+// ===== REAL-TIME BATCH & INVENTORY TRACKER =====
+async function loadBatchTrackerData() {
+  const container = document.getElementById('batch-cards-container');
+  if (!container) return;
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/batch`);
+    const contentType = response.headers.get("content-type");
+
+    if (!response.ok || !contentType || !contentType.includes("application/json")) {
+      throw new Error(`Failed to load batch records (Status: ${response.status})`);
+    }
+
+    const result = await response.json();
+    if (!result.success || !result.data) {
+      throw new Error(result.message || "Invalid payload structure");
+    }
+
+    renderBatchCards(result.data, container);
+  } catch (error) {
+    console.error("Batch Telemetry Error:", error);
+    container.innerHTML = `<div style="text-align: center; grid-column: 1/-1; color: #e74c3c;">
+      <p>Unable to sync live inventory data right now. Please refresh.</p>
+    </div>`;
+  }
+}
+
+function renderBatchCards(batches, container) {
+  container.innerHTML = '';
+
+  if (batches.length === 0) {
+    container.innerHTML = `<p style="text-align: center; grid-column: 1/-1;">No active pond batches recorded yet.</p>`;
+    return;
+  }
+
+  batches.forEach(batch => {
+    const totalBiomassKg = ((batch.currentStockCount * batch.averageWeightGrams) / 1000).toFixed(1);
+    const mortalityRate = batch.initialStockCount > 0 
+      ? ((batch.mortalityCount / batch.initialStockCount) * 100).toFixed(1) 
+      : 0;
+
+    const card = document.createElement('div');
+    card.style.cssText = `
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border-left: 5px solid #27ae60;
+    `;
+
+    card.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h3 style="margin: 0; font-size: 1.2rem; color: #2c3e50;">${batch.pondIdentifier} - ${batch.batchName}</h3>
+        <span style="background: #e8f8f5; color: #27ae60; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: bold;">
+          ${batch.stage}
+        </span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.9rem; color: #555;">
+        <div><b>Current Stock:</b> ${batch.currentStockCount.toLocaleString()} pcs</div>
+        <div><b>Total Biomass:</b> ${totalBiomassKg} kg</div>
+        <div><b>Avg Weight:</b> ${batch.averageWeightGrams}g</div>
+        <div><b>Mortality:</b> ${batch.mortalityCount} pcs (${mortalityRate}%)</div>
+        <div><b>Feed Inventory:</b> ${batch.feedInventoryBags} bags</div>
+        <div><b>Started:</b> ${new Date(batch.startDate).toLocaleDateString()}</div>
+      </div>
+    `;
+
+    container.appendChild(card);
+  });
+}
+
+// Auto-trigger when DOM loads
+document.addEventListener('DOMContentLoaded', () => {
+  loadBatchTrackerData();
+});
