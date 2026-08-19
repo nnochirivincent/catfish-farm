@@ -22,9 +22,9 @@
       <nav class="navbar" id="navbar">
         <a href="index.html">Home</a>
         <a href="products.html">Shop</a>
-        <a href="#feed-calculator">Calculator</a>
-        <a href="#about">About</a>
-        <a href="#blog">Blog</a>
+        <a href="index.html#feed-calculator">Calculator</a>
+        <a href="index.html#about">About</a>
+        <a href="index.html#blog">Blog</a>
         <a href="faq.html">FAQ</a>
         <a href="contact.html">Contact</a>
         <a href="cart.html" class="cart-link">
@@ -34,7 +34,7 @@
 
       <!-- CTA BUTTONS -->
       <div class="header-actions">
-        <a href="https://wa.me/2348034732228" class="btn-whatsapp-small">💬 WhatsApp</a>
+        <a href="https://wa.me/2348034732228" class="btn-whatsapp-small" target="_blank">💬 WhatsApp</a>
         <button class="hamburger" id="hamburger">☰</button>
       </div>
 
@@ -52,7 +52,7 @@
           <p>100% Healthy, Antibiotic-Free Clarias Gariepinus. Same-day delivery across Lagos.</p>
           <div class="hero-btns">
             <a href="products.html" class="btn btn-primary">Order Now</a>
-            <a href="#about" class="btn btn-outline-white">Tour Our Farm</a>
+            <a href="index.html#about" class="btn btn-outline-white">Tour Our Farm</a>
           </div>
         </div>
       </div>
@@ -65,7 +65,7 @@
           <p>Perfect for stews, soups, and parties. Delivered fresh to your doorstep.</p>
           <div class="hero-btns">
             <a href="products.html" class="btn btn-primary">Shop Smoked Fish</a>
-            <a href="https://wa.me/2348034732228" class="btn btn-whatsapp">Chat on WhatsApp</a>
+            <a href="https://wa.me/2348034732228" class="btn btn-whatsapp" target="_blank">Chat on WhatsApp</a>
           </div>
         </div>
       </div>
@@ -78,7 +78,7 @@
           <p>Get quality fingerlings + free feeding guide. Start making profit in 4 months.</p>
           <div class="hero-btns">
             <a href="products.html" class="btn btn-primary">Buy Fingerlings</a>
-            <a href="#blog" class="btn btn-outline-white">Read Farming Tips</a>
+            <a href="index.html#blog" class="btn btn-outline-white">Read Farming Tips</a>
           </div>
         </div>
       </div>
@@ -105,21 +105,21 @@
         <h4>Live Catfish</h4>
         <p>Fresh Clarias Gariepinus. Available: 1kg, 2kg, 5kg, 10kg+</p>
         <p class="price">From ₦3,500/kg</p>
-        <button onclick="addToCart(1)" class="btn btn-primary">Add to Cart</button>
+        <button onclick="addToCart(1, 'Live Catfish (1kg)', 3500, './assets/images/live-catfish.jpeg')" class="btn btn-primary">Add to Cart</button>
       </div>
       <div class="size-card">
         <img src="./assets/images/smoked-catfish.jpeg" alt="Dried Smoked Catfish">
         <h4>Smoked Catfish</h4>
         <p>Oven dried catfish. Perfect for stew and pepper soup</p>
         <p class="price">From ₦5,000/pack</p>
-        <button onclick="addToCart(2)" class="btn btn-primary">Add to Cart</button>
+        <button onclick="addToCart(3, 'Oven-Smoked Catfish (Pack of 4)', 5000, './assets/images/smoked-catfish.jpeg')" class="btn btn-primary">Add to Cart</button>
       </div>
       <div class="size-card">
         <img src="./assets/images/3rd-image.jpeg" alt="Catfish Fingerlings">
         <h4>Fingerlings</h4>
         <p>3-4 weeks old healthy catfish juveniles for your farm</p>
         <p class="price">₦8,000/100pcs</p>
-        <button onclick="addToCart(3)" class="btn btn-primary">Add to Cart</button>
+        <button onclick="addToCart(5, 'Catfish Fingerlings (100pcs)', 8000, './assets/images/3rd-image.jpeg')" class="btn btn-primary">Add to Cart</button>
       </div>
     </div>
   </section>
@@ -237,111 +237,111 @@
   </section>
 
   <!-- BATCH PROFITABILITY ESTIMATOR SECTION -->
-<section id="profitability-estimator" class="estimator-section" style="padding: 60px 20px; background-color: #f8fafc;">
-  <div class="container" style="max-width: 1100px; margin: 0 auto;">
-    <div style="text-align: center; margin-bottom: 40px;">
-      <h2 style="font-size: 2.2rem; color: #0f172a; margin-bottom: 10px;">📊 Interactive Batch Profitability Estimator</h2>
-      <p style="color: #475569; font-size: 1rem;">Project your catfish farming production costs, feed requirement, revenue, and net profit before stocking.</p>
-    </div>
-
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px;">
-      <!-- INPUT FORM -->
-      <div style="background: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
-        <h3 style="font-size: 1.3rem; margin-bottom: 20px; color: #1e293b;">1. Input Batch Parameters</h3>
-        
-        <div style="margin-bottom: 15px;">
-          <label style="display: block; font-weight: 600; margin-bottom: 5px;">Total Fish Stocked (Quantity)</label>
-          <input type="number" id="est-stock-count" placeholder="e.g. 1000" value="1000" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
-        </div>
-
-        <div style="margin-bottom: 15px;">
-          <label style="display: block; font-weight: 600; margin-bottom: 5px;">Target Harvest Weight (kg per fish)</label>
-          <input type="number" step="0.1" id="est-target-weight" placeholder="e.g. 1.0" value="1.0" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
-        </div>
-
-        <div style="margin-bottom: 15px;">
-          <label style="display: block; font-weight: 600; margin-bottom: 5px;">Expected Mortality Rate (%)</label>
-          <input type="number" id="est-mortality" placeholder="e.g. 5" value="5" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
-        </div>
-
-        <div style="margin-bottom: 15px;">
-          <label style="display: block; font-weight: 600; margin-bottom: 5px;">Cost per Fingerling/Juvenile (₦)</label>
-          <input type="number" id="est-fingerling-cost" placeholder="e.g. 80" value="80" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
-        </div>
-
-        <div style="margin-bottom: 15px;">
-          <label style="display: block; font-weight: 600; margin-bottom: 5px;">Average Feed Cost per 15kg Bag (₦)</label>
-          <input type="number" id="est-feed-bag-cost" placeholder="e.g. 22000" value="22000" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
-        </div>
-
-        <div style="margin-bottom: 15px;">
-          <label style="display: block; font-weight: 600; margin-bottom: 5px;">Target Market Selling Price per kg (₦)</label>
-          <input type="number" id="est-selling-price" placeholder="e.g. 3500" value="3500" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
-        </div>
-
-        <div style="margin-bottom: 20px;">
-          <label style="display: block; font-weight: 600; margin-bottom: 5px;">Other Overhead Expenses (Pumping, Labor, Drugs) (₦)</label>
-          <input type="number" id="est-overheads" placeholder="e.g. 50000" value="50000" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
-        </div>
-
-        <button id="calc-profit-btn" style="width: 100%; background: #16a34a; color: white; padding: 12px; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s;">
-          📈 Calculate Batch Profitability
-        </button>
+  <section id="profitability-estimator" class="estimator-section" style="padding: 60px 20px; background-color: #f8fafc;">
+    <div class="container" style="max-width: 1100px; margin: 0 auto;">
+      <div style="text-align: center; margin-bottom: 40px;">
+        <h2 style="font-size: 2.2rem; color: #0f172a; margin-bottom: 10px;">📊 Interactive Batch Profitability Estimator</h2>
+        <p style="color: #475569; font-size: 1rem;">Project your catfish farming production costs, feed requirement, revenue, and net profit before stocking.</p>
       </div>
 
-      <!-- RESULTS DASHBOARD -->
-      <div id="profit-results" style="background: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: space-between;">
-        <div>
-          <h3 style="font-size: 1.3rem; margin-bottom: 20px; color: #1e293b;">2. Estimated Financial Summary</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px;">
+        <!-- INPUT FORM -->
+        <div style="background: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0;">
+          <h3 style="font-size: 1.3rem; margin-bottom: 20px; color: #1e293b;">1. Input Batch Parameters</h3>
           
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
-            <div style="background: #f1f5f9; padding: 12px; border-radius: 8px;">
-              <small style="color: #64748b; font-weight: 600;">Surviving Harvest Stock</small>
-              <h4 id="res-surviving-fish" style="font-size: 1.2rem; color: #0f172a; margin-top: 4px;">-- pcs</h4>
-            </div>
-            <div style="background: #f1f5f9; padding: 12px; border-radius: 8px;">
-              <small style="color: #64748b; font-weight: 600;">Total Harvest Biomass</small>
-              <h4 id="res-total-biomass" style="font-size: 1.2rem; color: #0f172a; margin-top: 4px;">-- kg</h4>
-            </div>
-            <div style="background: #f1f5f9; padding: 12px; border-radius: 8px;">
-              <small style="color: #64748b; font-weight: 600;">Feed Required (15kg bags)</small>
-              <h4 id="res-total-bags" style="font-size: 1.2rem; color: #0f172a; margin-top: 4px;">-- bags</h4>
-            </div>
-            <div style="background: #f1f5f9; padding: 12px; border-radius: 8px;">
-              <small style="color: #64748b; font-weight: 600;">Total Production Cost</small>
-              <h4 id="res-total-cost" style="font-size: 1.2rem; color: #dc2626; margin-top: 4px;">₦0</h4>
-            </div>
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 5px;">Total Fish Stocked (Quantity)</label>
+            <input type="number" id="est-stock-count" placeholder="e.g. 1000" value="1000" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
           </div>
 
-          <div style="border-top: 2px dashed #e2e8f0; padding-top: 20px; margin-top: 10px;">
-            <div style="margin-bottom: 12px; display: flex; justify-content: space-between;">
-              <span style="color: #475569;">Projected Gross Revenue:</span>
-              <strong id="res-revenue" style="color: #0f172a;">₦0</strong>
-            </div>
-            <div style="margin-bottom: 12px; display: flex; justify-content: space-between;">
-              <span style="color: #475569;">Net Projected Profit:</span>
-              <strong id="res-net-profit" style="color: #16a34a; font-size: 1.2rem;">₦0</strong>
-            </div>
-            <div style="margin-bottom: 12px; display: flex; justify-content: space-between;">
-              <span style="color: #475569;">Return on Investment (ROI):</span>
-              <strong id="res-roi" style="color: #2563eb;">0%</strong>
-            </div>
-            <div style="display: flex; justify-content: space-between;">
-              <span style="color: #475569;">Profit Margin:</span>
-              <strong id="res-margin" style="color: #2563eb;">0%</strong>
-            </div>
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 5px;">Target Harvest Weight (kg per fish)</label>
+            <input type="number" step="0.1" id="est-target-weight" placeholder="e.g. 1.0" value="1.0" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
           </div>
-        </div>
 
-        <div style="margin-top: 25px;">
-          <button id="save-estimate-btn" style="width: 100%; background: #0284c7; color: white; padding: 10px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">
-            💾 Save Estimate to Database
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 5px;">Expected Mortality Rate (%)</label>
+            <input type="number" id="est-mortality" placeholder="e.g. 5" value="5" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
+          </div>
+
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 5px;">Cost per Fingerling/Juvenile (₦)</label>
+            <input type="number" id="est-fingerling-cost" placeholder="e.g. 80" value="80" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
+          </div>
+
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 5px;">Average Feed Cost per 15kg Bag (₦)</label>
+            <input type="number" id="est-feed-bag-cost" placeholder="e.g. 22000" value="22000" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
+          </div>
+
+          <div style="margin-bottom: 15px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 5px;">Target Market Selling Price per kg (₦)</label>
+            <input type="number" id="est-selling-price" placeholder="e.g. 3500" value="3500" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
+          </div>
+
+          <div style="margin-bottom: 20px;">
+            <label style="display: block; font-weight: 600; margin-bottom: 5px;">Other Overhead Expenses (Pumping, Labor, Drugs) (₦)</label>
+            <input type="number" id="est-overheads" placeholder="e.g. 50000" value="50000" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
+          </div>
+
+          <button id="calc-profit-btn" style="width: 100%; background: #16a34a; color: white; padding: 12px; border: none; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: background 0.2s;">
+            📈 Calculate Batch Profitability
           </button>
         </div>
+
+        <!-- RESULTS DASHBOARD -->
+        <div id="profit-results" style="background: #ffffff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <h3 style="font-size: 1.3rem; margin-bottom: 20px; color: #1e293b;">2. Estimated Financial Summary</h3>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+              <div style="background: #f1f5f9; padding: 12px; border-radius: 8px;">
+                <small style="color: #64748b; font-weight: 600;">Surviving Harvest Stock</small>
+                <h4 id="res-surviving-fish" style="font-size: 1.2rem; color: #0f172a; margin-top: 4px;">-- pcs</h4>
+              </div>
+              <div style="background: #f1f5f9; padding: 12px; border-radius: 8px;">
+                <small style="color: #64748b; font-weight: 600;">Total Harvest Biomass</small>
+                <h4 id="res-total-biomass" style="font-size: 1.2rem; color: #0f172a; margin-top: 4px;">-- kg</h4>
+              </div>
+              <div style="background: #f1f5f9; padding: 12px; border-radius: 8px;">
+                <small style="color: #64748b; font-weight: 600;">Feed Required (15kg bags)</small>
+                <h4 id="res-total-bags" style="font-size: 1.2rem; color: #0f172a; margin-top: 4px;">-- bags</h4>
+              </div>
+              <div style="background: #f1f5f9; padding: 12px; border-radius: 8px;">
+                <small style="color: #64748b; font-weight: 600;">Total Production Cost</small>
+                <h4 id="res-total-cost" style="font-size: 1.2rem; color: #dc2626; margin-top: 4px;">₦0</h4>
+              </div>
+            </div>
+
+            <div style="border-top: 2px dashed #e2e8f0; padding-top: 20px; margin-top: 10px;">
+              <div style="margin-bottom: 12px; display: flex; justify-content: space-between;">
+                <span style="color: #475569;">Projected Gross Revenue:</span>
+                <strong id="res-revenue" style="color: #0f172a;">₦0</strong>
+              </div>
+              <div style="margin-bottom: 12px; display: flex; justify-content: space-between;">
+                <span style="color: #475569;">Net Projected Profit:</span>
+                <strong id="res-net-profit" style="color: #16a34a; font-size: 1.2rem;">₦0</strong>
+              </div>
+              <div style="margin-bottom: 12px; display: flex; justify-content: space-between;">
+                <span style="color: #475569;">Return on Investment (ROI):</span>
+                <strong id="res-roi" style="color: #2563eb;">0%</strong>
+              </div>
+              <div style="display: flex; justify-content: space-between;">
+                <span style="color: #475569;">Profit Margin:</span>
+                <strong id="res-margin" style="color: #2563eb;">0%</strong>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top: 25px;">
+            <button id="save-estimate-btn" style="width: 100%; background: #0284c7; color: white; padding: 10px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">
+              💾 Save Estimate to Database
+            </button>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
   <!-- ===== ABOUT SECTION ===== -->
   <section id="about" class="about">
@@ -422,7 +422,7 @@
         <div class="cta-badges"><span>✅ Same-Day Delivery</span><span>✅ 100% Healthy Clarias</span><span>✅ Pay on Delivery</span></div>
         <div class="cta-buttons">
           <a href="products.html" class="btn btn-primary btn-large">Shop Now</a>
-          <a href="https://wa.me/2348034732228" class="btn btn-whatsapp btn-large">💬 Chat on WhatsApp</a>
+          <a href="https://wa.me/2348034732228" class="btn btn-whatsapp btn-large" target="_blank">💬 Chat on WhatsApp</a>
         </div>
         <p class="cta-note">Delivery: Mon - Sat | 8AM - 6PM | Lagos Only</p>
       </div>
@@ -458,15 +458,15 @@
       <div class="footer-col">
         <h4>🐟 Victory Catfish Farm</h4>
         <p>Your #1 source for fresh, healthy, antibiotic-free African Catfish in Lagos.</p>
-        <div class="socials"><a href="https://wa.me/2348034732228">📱</a><a href="#">📸</a><a href="#">📘</a></div>
+        <div class="socials"><a href="https://wa.me/2348034732228" target="_blank">📱</a><a href="#">📸</a><a href="#">📘</a></div>
       </div>
       <div class="footer-col">
         <h4>Quick Links</h4>
         <ul>
           <li><a href="index.html">Home</a></li>
           <li><a href="products.html">Shop Catfish</a></li>
-          <li><a href="#about">About Our Farm</a></li>
-          <li><a href="#blog">Farming Blog</a></li>
+          <li><a href="index.html#about">About Our Farm</a></li>
+          <li><a href="index.html#blog">Farming Blog</a></li>
           <li><a href="cart.html">View Cart</a></li>
         </ul>
       </div>
@@ -474,7 +474,7 @@
         <h4>Contact Us</h4>
         <ul class="contact-info">
           <li>📍 Lagos, Nigeria</li>
-          <li>📞 WhatsApp: <a href="https://wa.me/2348034732228">080-3473-2228</a></li>
+          <li>📞 WhatsApp: <a href="https://wa.me/2348034732228" target="_blank">080-3473-2228</a></li>
           <li>⏰ Mon - Sat: 8AM - 6PM</li>
           <li>🚚 Same-Day Delivery in Lagos</li>
         </ul>
