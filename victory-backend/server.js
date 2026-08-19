@@ -20,19 +20,21 @@ const productRoutes = require('./routes/product');
 const paymentRoutes = require('./routes/payment');
 const estimatorRoutes = require('./routes/estimator');
 const batchRoutes = require('./routes/batch');
+const traceabilityRoutes = require('./routes/traceability');
 
-// Mount routes
+// 4. MOUNT ROUTES
 app.use('/api', productRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/estimator', estimatorRoutes);
 app.use('/api/batch', batchRoutes);
+app.use('/api/traceability', traceabilityRoutes);
 
 // Root route
 app.get('/', (req, res) => {
   res.json({ status: true, message: "Victory Catfish Backend is Running ✅" });
 });
 
-// 4. FALLBACK FOR UNMATCHED ROUTES (Prevents <!DOCTYPE html> HTML 404 responses)
+// 5. FALLBACK FOR UNMATCHED ROUTES
 app.use((req, res) => {
   res.status(404).json({
     status: false,
@@ -40,7 +42,7 @@ app.use((req, res) => {
   });
 });
 
-// 5. DATABASE CONNECTION
+// 6. DATABASE CONNECTION & SERVER START
 mongoose.connect(process.env.MONGO_URL)
   .then(() => console.log("✅ MongoDB Connected"))
   .catch(err => console.log("❌ Mongo Error: ", err));
