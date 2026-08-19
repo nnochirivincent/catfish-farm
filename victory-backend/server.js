@@ -11,28 +11,38 @@ dns.setServers(['1.1.1.1', '8.8.8.8']);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// 2. MIDDLEWARE (MUST BE BEFORE ROUTES)
-app.use(cors({ origin: '*' })); // Allows requests from local live-server (127.0.0.1 / localhost)
+// 2. MIDDLEWARE
+app.use(cors({ origin: '*' }));
 app.use(express.json());
 
 // 3. IMPORT ROUTES
 const productRoutes = require('./routes/product');
 const paymentRoutes = require('./routes/payment');
-const estimatorRoutes = require('./routes/estimator'); // <-- ADDED ESTIMATOR ROUTE
+const estimatorRoutes = require('./routes/estimator');
 
+// Mount routes
 app.use('/api', productRoutes);
 app.use('/api/payment', paymentRoutes);
-app.use('/api/estimator', estimatorRoutes); // <-- MOUNTED ESTIMATOR ROUTE
+app.use('/api/estimator', estimatorRoutes);
 
-// 4. DATABASE CONNECTION
+// Root route
+app.get('/', (req, res) => {
+  res.json({ status: true, message: "Victory Catfish Backend is Running ✅" });
+});
+
+// 4. FALLBACK FOR UNMATCHED ROUTES (Prevents <!DOCTYPE html> HTML 404 responses)
+app.use((req, res) => {
+  res.status(404).json({
+    status: false,
+    message: `API Route Not Found: ${req.method} ${req.originalUrl}`
+  });
+});
+
+// 5. DATABASE CONNECTION
 mongoose.connect(process.env.MONGO_URL)
   .then(() => console.log("✅ MongoDB Connected"))
   .catch(err => console.log("❌ Mongo Error: ", err));
 
-app.get('/', (req, res) => {
-  res.json({ message: "Victory Catfish Backend is Running ✅" });
-});
-
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
