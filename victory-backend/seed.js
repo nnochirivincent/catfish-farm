@@ -3,6 +3,7 @@ dns.setServers(['1.1.1.1', '8.8.8.8']);
 require('dotenv').config();
 const mongoose = require('mongoose');
 const Product = require('./models/Product');
+const Batch = require('./models/batch');
 
 const products = [
   {
@@ -81,9 +82,25 @@ const products = [
 
 mongoose.connect(process.env.MONGO_URL)
   .then(async () => {
-    await Product.deleteMany(); // clear old
+    // 1. Clear and Seed Products
+    await Product.deleteMany({});
     await Product.insertMany(products);
     console.log("✅ Products Seeded Successfully!");
+
+    // 2. Clear and Seed Batch Telemetry Data
+    await Batch.deleteMany({});
+    await Batch.create({
+      pondIdentifier: "Pond 1",
+      batchName: "Alpha-2026 Batch",
+      initialStockCount: 2000,
+      currentStockCount: 1950,
+      mortalityCount: 50,
+      averageWeightGrams: 350,
+      feedInventoryBags: 12,
+      stage: "Post-Juvenile"
+    });
+    console.log("✅ Batch Data Seeded Successfully!");
+
     mongoose.connection.close();
   })
   .catch((err) => {
