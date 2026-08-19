@@ -88,18 +88,31 @@ mongoose.connect(process.env.MONGO_URL)
     console.log("✅ Products Seeded Successfully!");
 
     // 2. Clear and Seed Batch Telemetry Data
-    await Batch.deleteMany({});
-    await Batch.create({
-      pondIdentifier: "Pond 1",
-      batchName: "Alpha-2026 Batch",
-      initialStockCount: 2000,
-      currentStockCount: 1950,
-      mortalityCount: 50,
-      averageWeightGrams: 350,
-      feedInventoryBags: 12,
-      stage: "Post-Juvenile"
-    });
-    console.log("✅ Batch Data Seeded Successfully!");
+   // Replace the Batch seeding section in seed.js with this:
+await Batch.deleteMany({});
+await Batch.create([
+  {
+    pondIdentifier: "Pond 1",
+    batchName: "Alpha-2026 Batch",
+    initialStockCount: 2000,
+    currentStockCount: 1950,
+    mortalityCount: 50,
+    averageWeightGrams: 350,
+    feedInventoryBags: 12,
+    stage: "Post-Juvenile"
+  },
+  {
+    pondIdentifier: "Pond 2",
+    batchName: "Beta-2026 Batch",
+    initialStockCount: 3000,
+    currentStockCount: 2980,
+    mortalityCount: 20,
+    averageWeightGrams: 120,
+    feedInventoryBags: 25,
+    stage: "Juvenile"
+  }
+]);
+console.log("✅ Batch Data Seeded Successfully!");
 
     mongoose.connection.close();
   })
