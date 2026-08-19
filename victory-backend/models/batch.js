@@ -53,9 +53,7 @@ const batchSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Auto-update timestamp on save
-batchSchema.pre('save', function(next) {
+batchSchema.pre('save', function() {
   this.lastUpdated = Date.now();
-  next();
 });
-
 module.exports = mongoose.model('Batch', batchSchema);
