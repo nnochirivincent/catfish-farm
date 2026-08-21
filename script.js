@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderCartPage();  // Renders cart items if on cart.html
   updateCartUI();    // Syncs badge counts across all pages
   initCheckoutModal();
+  loadDiagnosticSymptoms();
 });
 
 // Helper: Save cart to browser storage
@@ -476,14 +477,12 @@ function initCheckoutModal() {
       try {
         if (payBtn) payBtn.textContent = "Processing...";
 
-        // Try primary payment initialize endpoint
         let response = await fetch(`${API_BASE_URL}/api/payment/initialize`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, amount: totalAmount, customerName: name, phone, cart })
         });
 
-        // Fallback to /api/checkout if payment route returns 404
         if (response.status === 404) {
           response = await fetch(`${API_BASE_URL}/api/checkout`, {
             method: 'POST',
@@ -588,11 +587,6 @@ function renderBatchCards(batches, container) {
   });
 }
 
-// Auto-trigger when DOM loads
-document.addEventListener('DOMContentLoaded', () => {
-  loadBatchTrackerData();
-});
-
 // ===== TRACEABILITY & QUALITY VERIFICATION SYSTEM =====
 async function verifyBatchCode() {
   const inputField = document.getElementById('traceability-search-input');
@@ -658,3 +652,124 @@ async function verifyBatchCode() {
       </div>`;
   }
 }
+
+// ===== 8. INTERACTIVE POND DIAGNOSTIC WIZARD (FRONTEND CONTROLLER) =====
+async function loadDiagnosticSymptoms() {
+  const container = document.getElementById('symptoms-checkbox-grid');
+  if (!container) return;
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/diagnostic/symptoms`);
+    const result = await response.json();
+
+    if (!response.ok || !result.success || result.data.length === 0) {
+      container.innerHTML = `<p style="color: #ef4444; grid-column: 1 / -1; text-align: center;">Unable to load diagnostic checklist options.</p>`;
+      return;
+    }
+
+    container.innerHTML = result.data.map(item => `
+      <label style="background: #ffffff; padding: 14px 16px; border-radius: 10px; border: 1px solid #cbd5e1; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.02);" onmouseover="this.style.borderColor='#16a34a'; this.style.boxShadow='0 4px 10px rgba(22,163,74,0.1)';" onmouseout="this.style.borderColor='#cbd5e1'; this.style.boxShadow='0 2px 5px rgba(0,0,0,0.02)';">
+        <input type="checkbox" value="${item.symptomKey}" class="diagnostic-symptom-checkbox" style="width: 20px; height: 20px; accent-color: #16a34a; cursor: pointer;" />
+        <span style="font-size: 0.95rem; font-weight: 600; color: #1e293b;">${item.symptomName}</span>
+      </label>
+    `).join('');
+  } catch (error) {
+    console.error("Error loading symptoms:", error);
+    container.innerHTML = `<p style="color: #ef4444; grid-column: 1 / -1; text-align: center;">Error connecting to diagnostic service.</p>`;
+  }
+}
+
+async function runPondDiagnosis() {
+  const reportContainer = document.getElementById('diagnostic-report-container');
+  const btn = document.getElementById('run-diagnostic-btn');
+  if (!reportContainer) return;
+
+  const checkboxes = document.querySelectorAll('.diagnostic-symptom-checkbox:checked');
+  const selectedKeys = Array.from(checkboxes).map(cb => cb.value);
+
+  if (selectedKeys.length === 0) {
+    reportContainer.innerHTML = `
+      <div style="background: #fef2f2; color: #991b1b; padding: 16px; border-radius: 10px; text-align: center; border: 1px solid #fecaca; font-weight: 600;">
+        ⚠️ Please check at least one symptom observed in your pond to generate an analysis.
+      </div>`;
+    return;
+  }
+
+  if (btn) btn.textContent = "⌛ Analyzing Symptoms...";
+  reportContainer.innerHTML = `<p style="text-align: center; color: #2563eb; font-weight: 600;">Evaluating pond parameters and preparing diagnostic action report...</p>`;
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/diagnostic/analyze`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ selectedKeys })
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      reportContainer.innerHTML = `
+        <div style="background: #fef2f2; color: #991b1b; padding: 16px; border-radius: 10px; text-align: center; border: 1px solid #fecaca;">
+          ${result.message || 'Diagnostic analysis failed.'}
+        </div>`;
+      return;
+    }
+
+    const { riskLevel, possibleCauses, recommendedActions } = result.data;
+
+    let badgeBg = '#dcfce7';
+    let badgeColor = '#15803d';
+    let borderColor = '#22c55e';
+
+    if (riskLevel === 'Medium') {
+      badgeBg = '#fef3c7';
+      badgeColor = '#b45309';
+      borderColor = '#f59e0b';
+    } else if (riskLevel === 'High' || riskLevel === 'Critical') {
+      badgeBg = '#fee2e2';
+      badgeColor = '#b91c1c';
+      borderColor = '#ef4444';
+    }
+
+    reportContainer.innerHTML = `
+      <div style="background: #ffffff; border: 2px solid ${borderColor}; border-radius: 12px; padding: 25px; box-shadow: 0 8px 25px rgba(0,0,0,0.06);">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 15px; margin-bottom: 20px;">
+          <div>
+            <h3 style="margin: 0; color: #0f172a; font-size: 1.3rem;">📋 Diagnostic Report Summary</h3>
+            <small style="color: #64748b;">Generated from Victory Farm Knowledge Base</small>
+          </div>
+          <span style="background: ${badgeBg}; color: ${badgeColor}; padding: 8px 16px; border-radius: 30px; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.5px;">
+            RISK LEVEL: ${riskLevel.toUpperCase()}
+          </span>
+        </div>
+
+        <div style="margin-bottom: 20px; background: #f8fafc; padding: 18px; border-radius: 10px;">
+          <h4 style="color: #1e293b; margin-top: 0; margin-bottom: 10px; font-size: 1.05rem;">⚠️ Potential Underlying Causes:</h4>
+          <ul style="margin: 0; padding-left: 20px; color: #334155; line-height: 1.6;">
+            ${possibleCauses.map(c => `<li style="margin-bottom: 6px;"><b>${c}</b></li>`).join('')}
+          </ul>
+        </div>
+
+        <div style="background: #f0fdf4; padding: 18px; border-radius: 10px; border: 1px solid #bbf7d0;">
+          <h4 style="color: #166534; margin-top: 0; margin-bottom: 10px; font-size: 1.05rem;">🛠️ Recommended Remedial Actions:</h4>
+          <ul style="margin: 0; padding-left: 20px; color: #14532d; font-weight: 600; line-height: 1.6;">
+            ${recommendedActions.map(a => `<li style="margin-bottom: 8px;">${a}</li>`).join('')}
+          </ul>
+        </div>
+      </div>
+    `;
+  } catch (error) {
+    console.error("Diagnostic execution error:", error);
+    reportContainer.innerHTML = `
+      <div style="background: #fef2f2; color: #991b1b; padding: 16px; border-radius: 10px; text-align: center;">
+        Unable to complete diagnosis. Check your network or server status.
+      </div>`;
+  } finally {
+    if (btn) btn.textContent = "🔬 Analyze Symptoms & Generate Report";
+  }
+}
+
+// Auto-load batch tracker on page load
+document.addEventListener('DOMContentLoaded', () => {
+  loadBatchTrackerData();
+});
