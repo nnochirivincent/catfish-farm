@@ -23,6 +23,7 @@
         <a href="index.html">Home</a>
         <a href="products.html">Shop</a>
         <a href="index.html#feed-calculator">Calculator</a>
+        <a href="index.html#diagnostic-wizard-section">Diagnostic Wizard</a>
         <a href="index.html#about">About</a>
         <a href="index.html#blog">Blog</a>
         <a href="faq.html">FAQ</a>
@@ -343,6 +344,29 @@
     </div>
   </section>
 
+  <!-- ===== INTERACTIVE POND DIAGNOSTIC WIZARD SECTION ===== -->
+  <section id="diagnostic-wizard-section" class="container my-5" style="background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); padding: 40px 25px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 10px 30px rgba(0,0,0,0.04);">
+    <div class="section-title text-center mb-4" style="max-width: 750px; margin: 0 auto 30px auto;">
+      <span style="background: #dbeafe; color: #1d4ed8; font-weight: 700; font-size: 0.8rem; padding: 4px 12px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px;">🏥 Pond Health & Troubleshooting</span>
+      <h2 style="font-size: 2.2rem; color: #0f172a; margin-top: 10px; margin-bottom: 10px;">Interactive Pond Diagnostic Wizard</h2>
+      <p style="color: #475569; font-size: 1rem; line-height: 1.6;">Select observed physical symptoms or water anomalies below to perform an instant automated risk assessment and get expert remedial protocols.</p>
+    </div>
+
+    <div style="max-width: 850px; margin: 0 auto;">
+      <div id="symptoms-checkbox-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 15px; margin-bottom: 25px;">
+        <p style="text-align: center; color: #64748b; grid-column: 1 / -1; padding: 20px;">Loading diagnostic checklist...</p>
+      </div>
+
+      <div style="text-align: center; margin-bottom: 30px;">
+        <button onclick="runPondDiagnosis()" id="run-diagnostic-btn" style="background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); color: white; border: none; padding: 14px 36px; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 1.05rem; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3); transition: all 0.2s ease;">
+          🔬 Analyze Symptoms & Generate Report
+        </button>
+      </div>
+
+      <div id="diagnostic-report-container"></div>
+    </div>
+  </section>
+
   <!-- ===== ABOUT SECTION ===== -->
   <section id="about" class="about">
     <div class="container">
@@ -414,35 +438,35 @@
   </section>
 
   <!-- REAL-TIME BATCH & INVENTORY TRACKER SECTION -->
-<section id="batch-tracker-section" class="container my-5">
-  <div class="section-title text-center mb-4">
-    <h2>Live Pond Batch & Inventory Tracker</h2>
-    <p>Monitor real-time stock levels, biomass, mortality rates, and feed reserves.</p>
-  </div>
-
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;" id="batch-cards-container">
-    <div style="text-align: center; padding: 20px; grid-column: 1/-1;">
-      <p>Loading real-time batch telemetry...</p>
+  <section id="batch-tracker-section" class="container my-5">
+    <div class="section-title text-center mb-4">
+      <h2>Live Pond Batch & Inventory Tracker</h2>
+      <p>Monitor real-time stock levels, biomass, mortality rates, and feed reserves.</p>
     </div>
-  </div>
-</section>
 
-<!-- TRACEABILITY & QUALITY VERIFICATION SECTION -->
-<section id="traceability-section" class="container my-5" style="background: #f8f9fa; padding: 30px; border-radius: 12px; border: 1px solid #e2e8f0;">
-  <div class="section-title text-center mb-4">
-    <h2>Batch Traceability & Quality Verification</h2>
-    <p>Verify product authenticity, water quality standards, feed source, and veterinary pass certificates.</p>
-  </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;" id="batch-cards-container">
+      <div style="text-align: center; padding: 20px; grid-column: 1/-1;">
+        <p>Loading real-time batch telemetry...</p>
+      </div>
+    </div>
+  </section>
 
-  <div style="max-width: 500px; margin: 0 auto 25px auto; display: flex; gap: 10px;">
-    <input type="text" id="traceability-search-input" placeholder="Enter Batch Code (e.g. BATCH-2026-A1)" style="flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 6px; text-transform: uppercase;" />
-    <button onclick="verifyBatchCode()" style="background: #27ae60; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;">Verify</button>
-  </div>
+  <!-- TRACEABILITY & QUALITY VERIFICATION SECTION -->
+  <section id="traceability-section" class="container my-5" style="background: #f8f9fa; padding: 30px; border-radius: 12px; border: 1px solid #e2e8f0;">
+    <div class="section-title text-center mb-4">
+      <h2>Batch Traceability & Quality Verification</h2>
+      <p>Verify product authenticity, water quality standards, feed source, and veterinary pass certificates.</p>
+    </div>
 
-  <div id="traceability-result-container" style="max-width: 650px; margin: 0 auto;">
-    <p style="text-align: center; color: #666;">Enter a valid batch code above to inspect quality records.</p>
-  </div>
-</section>
+    <div style="max-width: 500px; margin: 0 auto 25px auto; display: flex; gap: 10px;">
+      <input type="text" id="traceability-search-input" placeholder="Enter Batch Code (e.g. BATCH-2026-A1)" style="flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 6px; text-transform: uppercase;" />
+      <button onclick="verifyBatchCode()" style="background: #27ae60; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: bold;">Verify</button>
+    </div>
+
+    <div id="traceability-result-container" style="max-width: 650px; margin: 0 auto;">
+      <p style="text-align: center; color: #666;">Enter a valid batch code above to inspect quality records.</p>
+    </div>
+  </section>
 
   <!-- ===== CTA SECTION ===== -->
   <section class="cta">
@@ -462,7 +486,6 @@
       </div>
     </div>
   </section>
-
 
   <!-- STICKY CART BAR & FLOATING CHECKOUT -->
   <div class="vc-cart-bar" id="cartBar">
