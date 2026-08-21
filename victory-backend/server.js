@@ -1,4 +1,4 @@
-require('dotenv').config();
+Require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
@@ -21,6 +21,7 @@ const paymentRoutes = require('./routes/payment');
 const estimatorRoutes = require('./routes/estimator');
 const batchRoutes = require('./routes/batch');
 const traceabilityRoutes = require('./routes/traceability');
+const diagnosticRoutes = require('./routes/diagnostic');
 
 // 4. MOUNT ROUTES
 app.use('/api', productRoutes);
@@ -28,6 +29,7 @@ app.use('/api/payment', paymentRoutes);
 app.use('/api/estimator', estimatorRoutes);
 app.use('/api/batch', batchRoutes);
 app.use('/api/traceability', traceabilityRoutes);
+app.use('/api/diagnostic', diagnosticRoutes);
 
 // Root route
 app.get('/', (req, res) => {
