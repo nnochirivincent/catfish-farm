@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const Diagnostic = require('../models/diagnostic');
 
-// 1. GET ALL DIAGNOSTIC SYMPTOMS FOR FRONTEND WIZARD
-router.get('/symptoms', async (req, res) => {
+// Helper handler for fetching symptoms
+const getSymptomsHandler = async (req, res) => {
   try {
     const symptoms = await Diagnostic.find({});
     res.json({ success: true, data: symptoms });
@@ -11,7 +11,11 @@ router.get('/symptoms', async (req, res) => {
     console.error("Diagnostic symptoms fetch error:", err.message);
     res.status(500).json({ success: false, message: "Error fetching diagnostic data." });
   }
-});
+};
+
+// 1. GET ALL DIAGNOSTIC SYMPTOMS FOR FRONTEND WIZARD (Supports both / and /symptoms)
+router.get('/', getSymptomsHandler);
+router.get('/symptoms', getSymptomsHandler);
 
 // 2. ANALYZE SELECTED SYMPTOMS AND GENERATE DIAGNOSTIC REPORT
 router.post('/analyze', async (req, res) => {
