@@ -1,19 +1,33 @@
 <!DOCTYPE html>
-<html>
-<head><title>Payment Success</title></head>
-<body style="text-align:center; padding:50px;">
-  <h1>✅ Payment Successful!</h1>
-  <p>We have received your order. We will call you shortly.</p>
-  <a href="index.html">Back to Home</a>
-  
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Successful - Victory Catfish Farm</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body style="text-align:center; padding: 60px 20px; font-family: sans-serif; background: #f8fafc;">
+  <div style="max-width: 500px; margin: 0 auto; background: #ffffff; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); border-top: 6px solid #27ae60;">
+    <h1 style="color: #27ae60; font-size: 2.2rem; margin-top: 0;">✅ Payment Successful!</h1>
+    <p style="color: #475569; font-size: 1.1rem; line-height: 1.6;">We have received your order. Our team will contact you shortly to confirm delivery details.</p>
+    <a href="index.html" class="btn btn-primary" style="display: inline-block; margin-top: 20px; padding: 12px 24px; background: #27ae60; color: #fff; text-decoration: none; border-radius: 6px; font-weight: bold;">Return to Home</a>
+  </div>
+
   <script>
-    // This page will get ?reference=xxxx from Paystack
+    // 1. Clear cart immediately from browser storage
+    localStorage.removeItem('victory_catfish_cart');
+    localStorage.removeItem('cart');
+
+    // 2. Verify transaction on backend
+    const API_BASE_URL = 'https://victory-backend-vt8k.onrender.com';
     const urlParams = new URLSearchParams(window.location.search);
     const reference = urlParams.get('reference');
-    if(reference) {
-      fetch(`http://localhost:3000/api/payment/verify/${reference}`)
-      .then(res => res.json())
-      .then(data => console.log("Verified:", data));
+
+    if (reference) {
+      fetch(`${API_BASE_URL}/api/payment/verify/${reference}`)
+        .then(res => res.json())
+        .then(data => console.log("Transaction status verified:", data))
+        .catch(err => console.error("Verification endpoint error:", err));
     }
   </script>
 </body>
