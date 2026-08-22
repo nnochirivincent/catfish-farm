@@ -23,6 +23,15 @@ function saveCart() {
   localStorage.setItem('victory_catfish_cart', JSON.stringify(cart));
 }
 
+// Helper: Clear cart fully
+window.clearCart = function() {
+  cart = [];
+  localStorage.removeItem('victory_catfish_cart');
+  localStorage.removeItem('cart');
+  updateCartUI();
+  renderCartPage();
+};
+
 // ===== 0. HERO SLIDER =====
 function initHeroSlider() {
   const slides = document.querySelectorAll('.hero-slider .slide');
@@ -498,10 +507,12 @@ function initCheckoutModal() {
 
         const data = await response.json();
         
-        if (data.status && data.data?.authorization_url) {
-          window.location.href = data.data.authorization_url;
-        } else if (data.authorization_url) {
-          window.location.href = data.authorization_url;
+        const authUrl = data.status && data.data?.authorization_url ? data.data.authorization_url : data.authorization_url;
+
+        if (authUrl) {
+          // Clear cart right before moving to Paystack checkout portal
+          window.clearCart();
+          window.location.href = authUrl;
         } else {
           alert("Payment initialization response: " + (data.message || "Endpoint returned without authorization URL"));
         }
