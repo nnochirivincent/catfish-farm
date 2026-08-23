@@ -784,3 +784,46 @@ async function runPondDiagnosis() {
 document.addEventListener('DOMContentLoaded', () => {
   loadBatchTrackerData();
 });
+
+// ===== FETCH & RENDER PREMIUM MARKET TICKER =====
+async function loadMarketTicker() {
+  const container = document.getElementById('marketTickerContent');
+  if (!container) return;
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/market-prices`);
+    const result = await response.json();
+
+    if (!response.ok || !result.success || !result.data) {
+      container.innerHTML = `<span style="color:#f87171; font-size:0.85rem; padding-left:20px;">Live market feed offline</span>`;
+      return;
+    }
+
+    const cardsHTML = result.data.map(item => {
+      let symbol = '●';
+      let trendClass = 'trend-stable';
+
+      if (item.trend === 'up') {
+        symbol = '▲';
+        trendClass = 'trend-up';
+      } else if (item.trend === 'down') {
+        symbol = '▼';
+        trendClass = 'trend-down';
+      }
+
+      return `
+        <div class="ticker-card">
+          <span class="ticker-item-name">${item.item}</span>
+          <span class="ticker-price">${item.price}</span>
+          <span class="badge-trend ${trendClass}">${symbol} ${item.change}</span>
+        </div>
+      `;
+    }).join('');
+
+    // Duplicate content twice to guarantee a smooth continuous loop
+    container.innerHTML = cardsHTML + cardsHTML;
+  } catch (error) {
+    console.error("Market Ticker Error:", error);
+    container.innerHTML = `<span style="color:#f87171; font-size:0.85rem; padding-left:20px;">Market rates temporarily unavailable</span>`;
+  }
+}
