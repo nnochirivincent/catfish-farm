@@ -6,6 +6,7 @@ const API_BASE_URL = 'https://victory-backend-vt8k.onrender.com';
 
 // Wait for DOM to load fully
 document.addEventListener('DOMContentLoaded', () => {
+  injectGlobalMarketTicker(); // Automatically injects ticker above everything on all pages
   initHeroSlider();
   initTestimonials();
   initFeedCalculator();
@@ -16,7 +17,68 @@ document.addEventListener('DOMContentLoaded', () => {
   updateCartUI();    // Syncs badge counts across all pages
   initCheckoutModal();
   loadDiagnosticSymptoms();
+  loadBatchTrackerData();
 });
+
+// ===== GLOBAL LIVE MARKET TICKER INJECTION & DATA FETCHING =====
+function injectGlobalMarketTicker() {
+  // Prevent duplicate injection if it already exists
+  if (document.getElementById('globalMarketTicker')) return;
+
+  const tickerDiv = document.createElement('div');
+  tickerDiv.id = 'globalMarketTicker';
+  tickerDiv.className = 'global-market-ticker';
+  tickerDiv.innerHTML = `
+    <div class="global-ticker-label">Live Market Index</div>
+    <div class="global-ticker-track" id="globalPriceTickerTrack">
+      <span class="global-ticker-item">Fetching live agricultural market rates...</span>
+    </div>
+  `;
+
+  // Place it at the very top of the body across all pages
+  document.body.insertBefore(tickerDiv, document.body.firstChild);
+
+  // Fetch or load the pricing stages
+  fetchGlobalMarketPrices();
+  
+  // Auto-refresh market rates every 5 minutes
+  setInterval(fetchGlobalMarketPrices, 300000);
+}
+
+async function fetchGlobalMarketPrices() {
+  const tickerTrack = document.getElementById('globalPriceTickerTrack');
+  if (!tickerTrack) return;
+
+  try {
+    // Multi-stage fish pricing array (Fingerlings, Post-Fingerlings, Juveniles, Jumbo, Table Size, Broodstock)
+    const marketData = [
+      { name: "Fingerlings (2-4cm)", price: "₦85 /pc", trend: "▲" },
+      { name: "Post-Fingerlings", price: "₦120 /pc", trend: "▲" },
+      { name: "Juveniles", price: "₦160 /pc", trend: "▲" },
+      { name: "Jumbo", price: "₦250 /pc", trend: "■" },
+      { name: "Table Size (Per Kg)", price: "₦3,400 /kg", trend: "▲" },
+      { name: "Broodstock", price: "₦8,500 /pair", trend: "■" }
+    ];
+
+    let tickerHTML = '';
+    marketData.forEach(item => {
+      tickerHTML += `
+        <span class="global-ticker-item">
+          <span class="stage">${item.name}:</span> 
+          <span class="price">${item.price}</span>
+          <span class="trend">${item.trend}</span>
+        </span>
+      `;
+    });
+
+    // Duplicate string to ensure smooth seamless infinite scrolling loop
+    tickerTrack.innerHTML = tickerHTML + tickerHTML;
+
+  } catch (error) {
+    console.error("Error loading market rates:", error);
+    tickerTrack.innerHTML = `<span class="global-ticker-item" style="color: #ef4444;">Unable to fetch live rates at the moment.</span>`;
+  }
+}
 
 // Helper: Save cart to browser storage
 function saveCart() {
@@ -510,7 +572,6 @@ function initCheckoutModal() {
         const authUrl = data.status && data.data?.authorization_url ? data.data.authorization_url : data.authorization_url;
 
         if (authUrl) {
-          // Clear cart right before moving to Paystack checkout portal
           window.clearCart();
           window.location.href = authUrl;
         } else {
@@ -778,52 +839,4 @@ async function runPondDiagnosis() {
   } finally {
     if (btn) btn.textContent = "🔬 Analyze Symptoms & Generate Report";
   }
-}
-
-// Auto-load batch tracker on page load
-document.addEventListener('DOMContentLoaded', () => {
-  loadBatchTrackerData();
-});
-
-// ===== FETCH & RENDER PREMIUM MARKET TICKER =====
-async function loadMarketTicker() {
-  const container = document.getElementById('marketTickerContent');
-  if (!container) return;
-
-  try {
-    const response = await fetch(`${API_BASE_URL}/api/market-prices`);
-    const result = await response.json();
-
-    if (!response.ok || !result.success || !result.data) {
-      container.innerHTML = `<span style="color:#f87171; font-size:0.85rem; padding-left:20px;">Live market feed offline</span>`;
-      return;
-    }
-
-    const cardsHTML = result.data.map(item => {
-      let symbol = '●';
-      let trendClass = 'trend-stable';
-
-      if (item.trend === 'up') {
-        symbol = '▲';
-        trendClass = 'trend-up';
-      } else if (item.trend === 'down') {
-        symbol = '▼';
-        trendClass = 'trend-down';
-      }
-
-      return `
-        <div class="ticker-card">
-          <span class="ticker-item-name">${item.item}</span>
-          <span class="ticker-price">${item.price}</span>
-          <span class="badge-trend ${trendClass}">${symbol} ${item.change}</span>
-        </div>
-      `;
-    }).join('');
-
-    // Duplicate content twice to guarantee a smooth continuous loop
-    container.innerHTML = cardsHTML + cardsHTML;
-  } catch (error) {
-    console.error("Market Ticker Error:", error);
-    container.innerHTML = `<span style="color:#f87171; font-size:0.85rem; padding-left:20px;">Market rates temporarily unavailable</span>`;
-  }
-}
+}s
