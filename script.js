@@ -607,6 +607,8 @@ function initCheckoutModal() {
       const phone = document.getElementById('customerPhone')?.value.trim();
       const deliveryArea = document.getElementById('customerArea')?.value;
       const deliveryAddress = document.getElementById('customerAddress')?.value.trim();
+      console.log("Selected delivery area:", document.getElementById('customerArea'));
+      console.log("Delivery area value:", document.getElementById('customerArea')?.value);
          if (!name) {
   alert("Customer name is missing.");
   return;
