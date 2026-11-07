@@ -1,3 +1,4 @@
+
 // ===== GLOBAL CART ARRAY WITH LOCALSTORAGE =====
 let cart = JSON.parse(localStorage.getItem('victory_catfish_cart')) || [];
 
@@ -6,15 +7,15 @@ const API_BASE_URL = 'https://victory-backend-vt8k.onrender.com';
 
 // Wait for DOM to load fully
 document.addEventListener('DOMContentLoaded', () => {
-  injectGlobalMarketTicker(); // Automatically injects ticker above everything on all pages
+  injectGlobalMarketTicker();
   initHeroSlider();
   initTestimonials();
   initFeedCalculator();
   initProfitabilityEstimator();
   initMobileMenu();
   loadProductsFromBackend();
-  renderCartPage();  // Renders cart items if on cart.html
-  updateCartUI();    // Syncs badge counts across all pages
+  renderCartPage();
+  updateCartUI();
   initCheckoutModal();
   loadDiagnosticSymptoms();
   loadBatchTrackerData();
@@ -22,7 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ===== GLOBAL LIVE MARKET TICKER INJECTION & DATA FETCHING =====
 function injectGlobalMarketTicker() {
-  // Prevent duplicate injection if it already exists
   if (document.getElementById('globalMarketTicker')) return;
 
   const tickerDiv = document.createElement('div');
@@ -31,17 +31,13 @@ function injectGlobalMarketTicker() {
   tickerDiv.innerHTML = `
     <div class="global-ticker-label">Live Market Index</div>
     <div class="global-ticker-track" id="globalPriceTickerTrack">
-      <span class="global-ticker-item">Fetching live agricultural market rates...</span>
+      <span class="global-ticker-item">Fetching market rates...</span>
     </div>
   `;
 
-  // Place it at the very top of the body across all pages
   document.body.insertBefore(tickerDiv, document.body.firstChild);
 
-  // Fetch or load the pricing stages
   fetchGlobalMarketPrices();
-  
-  // Auto-refresh market rates every 5 minutes
   setInterval(fetchGlobalMarketPrices, 300000);
 }
 
@@ -50,7 +46,6 @@ async function fetchGlobalMarketPrices() {
   if (!tickerTrack) return;
 
   try {
-    // Multi-stage fish pricing array (Fingerlings, Post-Fingerlings, Juveniles, Jumbo, Table Size, Broodstock)
     const marketData = [
       { name: "Fingerlings (2-4cm)", price: "₦85 /pc", trend: "▲" },
       { name: "Post-Fingerlings", price: "₦120 /pc", trend: "▲" },
@@ -61,31 +56,34 @@ async function fetchGlobalMarketPrices() {
     ];
 
     let tickerHTML = '';
+
     marketData.forEach(item => {
       tickerHTML += `
         <span class="global-ticker-item">
-          <span class="stage">${item.name}:</span> 
+          <span class="stage">${item.name}:</span>
           <span class="price">${item.price}</span>
           <span class="trend">${item.trend}</span>
         </span>
       `;
     });
 
-    // Duplicate string to ensure smooth seamless infinite scrolling loop
     tickerTrack.innerHTML = tickerHTML + tickerHTML;
 
   } catch (error) {
     console.error("Error loading market rates:", error);
-    tickerTrack.innerHTML = `<span class="global-ticker-item" style="color: #ef4444;">Unable to fetch live rates at the moment.</span>`;
+    tickerTrack.innerHTML = `
+      <span class="global-ticker-item" style="color: #ef4444;">
+        Unable to load market rates at the moment.
+      </span>
+    `;
   }
 }
 
-// Helper: Save cart to browser storage
+// ===== CART STORAGE HELPERS =====
 function saveCart() {
   localStorage.setItem('victory_catfish_cart', JSON.stringify(cart));
 }
 
-// Helper: Clear cart fully
 window.clearCart = function() {
   cart = [];
   localStorage.removeItem('victory_catfish_cart');
@@ -107,19 +105,23 @@ function initHeroSlider() {
   let slideInterval;
 
   function showSlide(index) {
-    slides.forEach((slide, i) => slide.classList.toggle('active', i === index));
-    dots.forEach((dot, i) => dot.classList.toggle('active', i === index));
+    slides.forEach((slide, i) =>
+      slide.classList.toggle('active', i === index)
+    );
+
+    dots.forEach((dot, i) =>
+      dot.classList.toggle('active', i === index)
+    );
+
     currentSlide = index;
   }
 
   function nextSlide() {
-    let nextIndex = (currentSlide + 1) % slides.length;
-    showSlide(nextIndex);
+    showSlide((currentSlide + 1) % slides.length);
   }
 
   function prevSlide() {
-    let prevIndex = (currentSlide - 1 + slides.length) % slides.length;
-    showSlide(prevIndex);
+    showSlide((currentSlide - 1 + slides.length) % slides.length);
   }
 
   function startAutoPlay() {
@@ -169,7 +171,9 @@ function initTestimonials() {
       if (card.classList.contains('show')) isShowing = true;
     });
 
-    seeMoreBtn.textContent = isShowing ? "Show Less Testimonials ↑" : "See More Testimonials ↓";
+    seeMoreBtn.textContent = isShowing
+      ? "Show Less Testimonials ↑"
+      : "See More Testimonials ↓";
   });
 }
 
@@ -253,7 +257,13 @@ function initProfitabilityEstimator() {
   async function computeProfitability(save = false) {
     const inputs = getInputs();
 
-    if (!inputs.stockCount || !inputs.targetWeightKg || !inputs.fingerlingCost || !inputs.feedCostPerBag || !inputs.sellingPricePerKg) {
+    if (
+      !inputs.stockCount ||
+      !inputs.targetWeightKg ||
+      !inputs.fingerlingCost ||
+      !inputs.feedCostPerBag ||
+      !inputs.sellingPricePerKg
+    ) {
       alert("Please fill in all required numbers.");
       return;
     }
@@ -268,11 +278,13 @@ function initProfitabilityEstimator() {
       });
 
       const contentType = response.headers.get("content-type");
+
       if (!contentType || !contentType.includes("application/json")) {
         throw new Error(`Server returned HTML error (${response.status}). Check backend service.`);
       }
 
       const resData = await response.json();
+
       if (!response.ok || !resData.success) {
         throw new Error(resData.message || 'Calculation failed on backend');
       }
@@ -293,7 +305,7 @@ function initProfitabilityEstimator() {
       setTxt('res-roi', `${m.roiPercent}%`);
       setTxt('res-margin', `${m.profitMarginPercent}%`);
 
-      if (save) alert("Batch estimate saved successfully to database! 🚀");
+      if (save) alert("Batch estimate saved successfully to database!");
 
     } catch (err) {
       console.error("Estimator error:", err);
@@ -304,7 +316,10 @@ function initProfitabilityEstimator() {
   }
 
   calcBtn.addEventListener('click', () => computeProfitability(false));
-  if (saveBtn) saveBtn.addEventListener('click', () => computeProfitability(true));
+
+  if (saveBtn) {
+    saveBtn.addEventListener('click', () => computeProfitability(true));
+  }
 }
 
 // ===== 3. MOBILE MENU TOGGLE =====
@@ -313,41 +328,57 @@ function initMobileMenu() {
   const navbar = document.getElementById('navbar');
 
   if (hamburger && navbar) {
-    hamburger.addEventListener('click', () => navbar.classList.toggle('active'));
+    hamburger.addEventListener('click', () =>
+      navbar.classList.toggle('active')
+    );
   }
 }
 
 // ===== 4. LOAD PRODUCTS FROM BACKEND =====
 async function loadProductsFromBackend() {
-  const container = document.getElementById('product-list') || document.getElementById('products-grid');
+  const container =
+    document.getElementById('product-list') ||
+    document.getElementById('products-grid');
+
   if (!container) return;
 
   try {
     const response = await fetch(`${API_BASE_URL}/api/products`);
     const contentType = response.headers.get("content-type");
-    
+
     if (!response.ok || !contentType || !contentType.includes("application/json")) {
       throw new Error(`Failed to fetch products (Status: ${response.status})`);
     }
 
     const products = await response.json();
     renderProducts(products, container);
+
   } catch (error) {
     console.error('Error fetching products:', error);
-    container.innerHTML = `<p style="text-align: center; grid-column: 1/-1;">Unable to load products. Please refresh.</p>`;
+    container.innerHTML = `
+      <p style="text-align: center; grid-column: 1/-1;">
+        Unable to load products. Please refresh.
+      </p>
+    `;
   }
 }
 
 function renderProducts(products, container) {
   container.innerHTML = '';
+
   if (!products || products.length === 0) {
-    container.innerHTML = `<p style="text-align: center; grid-column: 1/-1;">No products available at the moment.</p>`;
+    container.innerHTML = `
+      <p style="text-align: center; grid-column: 1/-1;">
+        No products available at the moment.
+      </p>
+    `;
     return;
   }
 
   products.forEach(product => {
     const card = document.createElement('div');
     card.className = 'product-card';
+
     card.innerHTML = `
       <img src="${product.image || 'https://via.placeholder.com/300x200'}" alt="${product.name}">
       <div class="product-card-content">
@@ -359,6 +390,7 @@ function renderProducts(products, container) {
         </button>
       </div>
     `;
+
     container.appendChild(card);
   });
 }
@@ -366,11 +398,19 @@ function renderProducts(products, container) {
 // ===== 5. SHOPPING CART MANAGEMENT =====
 window.addToCart = function(id, name, price, image) {
   const existingIndex = cart.findIndex(item => String(item.id) === String(id));
+
   if (existingIndex > -1) {
     cart[existingIndex].quantity += 1;
   } else {
-    cart.push({ id, name, price: Number(price), image, quantity: 1 });
+    cart.push({
+      id,
+      name,
+      price: Number(price),
+      image,
+      quantity: 1
+    });
   }
+
   saveCart();
   updateCartUI();
   renderCartPage();
@@ -389,6 +429,7 @@ window.updateQuantity = function(id, change) {
   if (!item) return;
 
   item.quantity += change;
+
   if (item.quantity <= 0) {
     window.removeFromCart(id);
   } else {
@@ -410,11 +451,14 @@ function updateCartUI() {
 
   const cartBar = document.getElementById('cartBar');
   const cartBarText = document.getElementById('vc-cart-summary');
+
   if (cartBar) {
     if (totalItems > 0) {
       cartBar.style.display = 'flex';
+
       if (cartBarText) {
-        cartBarText.textContent = `${totalItems} item(s) selected - Total: ₦${totalPrice.toLocaleString()}`;
+        cartBarText.textContent =
+          `${totalItems} item(s) selected - Total: ₦${totalPrice.toLocaleString()}`;
       }
     } else {
       cartBar.style.display = 'none';
@@ -422,13 +466,17 @@ function updateCartUI() {
   }
 
   const floatBtn = document.getElementById('floatingCheckoutBtn');
-  if (floatBtn) floatBtn.style.display = totalItems > 0 ? 'block' : 'none';
+  if (floatBtn) {
+    floatBtn.style.display = totalItems > 0 ? 'block' : 'none';
+  }
 
   const finalAmountEl = document.getElementById('finalAmount');
-  if (finalAmountEl) finalAmountEl.textContent = totalPrice.toLocaleString();
+  if (finalAmountEl) {
+    finalAmountEl.textContent = totalPrice.toLocaleString();
+  }
 }
 
-// ===== 6. RENDER CART PAGE (cart.html) =====
+// ===== 6. RENDER CART PAGE =====
 function renderCartPage() {
   const cartItemsContainer = document.getElementById('cart-items');
   const emptyCartDiv = document.getElementById('empty-cart');
@@ -457,7 +505,10 @@ function renderCartPage() {
 
     const row = document.createElement('div');
     row.className = 'cart-item';
-    row.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #eee;';
+
+    row.style.cssText =
+      'display: flex; justify-content: space-between; align-items: center; padding: 15px 0; border-bottom: 1px solid #eee;';
+
     row.innerHTML = `
       <div style="display: flex; align-items: center; gap: 15px;">
         <img src="${item.image || 'https://via.placeholder.com/80'}" alt="${item.name}" style="width: 70px; height: 70px; object-fit: cover; border-radius: 8px;">
@@ -476,12 +527,19 @@ function renderCartPage() {
         <button onclick="removeFromCart('${item.id}')" style="background: none; border: none; color: #e74c3c; cursor: pointer; text-decoration: underline; font-size: 0.85rem;">Remove</button>
       </div>
     `;
+
     cartItemsContainer.appendChild(row);
   });
 
   const deliveryFee = 2000;
-  if (subtotalEl) subtotalEl.textContent = `₦${subtotal.toLocaleString()}`;
-  if (totalEl) totalEl.textContent = `₦${(subtotal + deliveryFee).toLocaleString()}`;
+
+  if (subtotalEl) {
+    subtotalEl.textContent = `₦${subtotal.toLocaleString()}`;
+  }
+
+  if (totalEl) {
+    totalEl.textContent = `₦${(subtotal + deliveryFee).toLocaleString()}`;
+  }
 }
 
 // ===== 7. CHECKOUT MODAL & PAYSTACK CONTROLS =====
@@ -490,6 +548,7 @@ window.openCheckoutModal = function() {
     alert("Your cart is empty. Add items before checking out.");
     return;
   }
+
   const modal = document.getElementById('checkoutModal');
   if (modal) modal.style.display = 'flex';
 };
@@ -501,29 +560,39 @@ window.closeCheckoutModal = function() {
 
 function initCheckoutModal() {
   const checkoutBtn = document.getElementById('checkoutBtn');
+
   if (checkoutBtn) {
     checkoutBtn.addEventListener('click', openCheckoutModal);
   }
 
   const whatsappCheckoutBtn = document.getElementById('whatsappCheckoutBtn');
+
   if (whatsappCheckoutBtn) {
     whatsappCheckoutBtn.addEventListener('click', () => {
       if (cart.length === 0) {
         alert("Your cart is empty!");
         return;
       }
+
       let message = "Hello Victory Catfish Farm, I want to order:\n\n";
       let total = 0;
+
       cart.forEach(item => {
         message += `• ${item.name} (${item.quantity}x) - ₦${(item.price * item.quantity).toLocaleString()}\n`;
         total += item.price * item.quantity;
       });
+
       message += `\nSubtotal: ₦${total.toLocaleString()}\nDelivery: ₦2,000\nTotal: ₦${(total + 2000).toLocaleString()}`;
-      window.open(`https://wa.me/2348034732228?text=${encodeURIComponent(message)}`, '_blank');
+
+      window.open(
+        `https://wa.me/2348034732228?text=${encodeURIComponent(message)}`,
+        '_blank'
+      );
     });
   }
 
   const checkoutForm = document.getElementById('checkoutForm');
+
   if (checkoutForm) {
     checkoutForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -533,55 +602,83 @@ function initCheckoutModal() {
         return;
       }
 
-      const name = document.getElementById('customerName')?.value;
-      const email = document.getElementById('customerEmail')?.value;
-      const phone = document.getElementById('customerPhone')?.value;
+      const name = document.getElementById('customerName')?.value.trim();
+      const email = document.getElementById('customerEmail')?.value.trim();
+      const phone = document.getElementById('customerPhone')?.value.trim();
+      const deliveryArea = document.getElementById('customerArea')?.value;
+      const deliveryAddress = document.getElementById('customerAddress')?.value.trim();
 
-      if (!name || !email || !phone) {
-        alert("Please complete all checkout fields.");
+      if (
+        !name ||
+        !email ||
+        !phone ||
+        !deliveryArea ||
+        !deliveryAddress
+      ) {
+        alert("Please complete all checkout fields, including your delivery address.");
         return;
       }
 
-      const totalAmount = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) + 2000;
+      const totalAmount =
+        cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) + 2000;
+
       const payBtn = document.getElementById('payNowBtn');
 
       try {
-        if (payBtn) payBtn.textContent = "Processing...";
-
-        let response = await fetch(`${API_BASE_URL}/api/payment/initialize`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, amount: totalAmount, customerName: name, phone, cart })
-        });
-
-        if (response.status === 404) {
-          response = await fetch(`${API_BASE_URL}/api/checkout`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, amount: totalAmount, customerName: name, phone, cart })
-          });
+        if (payBtn) {
+          payBtn.textContent = "Processing...";
+          payBtn.disabled = true;
         }
 
+        const response = await fetch(`${API_BASE_URL}/api/payment/initialize`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email,
+            amount: totalAmount,
+            customerName: name,
+            phone,
+            deliveryArea,
+            deliveryAddress,
+            cart
+          })
+        });
+
         const contentType = response.headers.get("content-type");
+
         if (!contentType || !contentType.includes("application/json")) {
-          throw new Error(`Server payment route not found or sleeping (${response.status}). Check backend status on Render.`);
+          throw new Error(
+            `Server payment route returned an unexpected response (${response.status}).`
+          );
         }
 
         const data = await response.json();
-        
-        const authUrl = data.status && data.data?.authorization_url ? data.data.authorization_url : data.authorization_url;
+
+        if (!response.ok || !data.status) {
+          throw new Error(data.message || "Payment could not be initialized.");
+        }
+
+        const authUrl = data.data?.authorization_url;
 
         if (authUrl) {
-          window.clearCart();
+          // Keep the cart until payment is verified.
           window.location.href = authUrl;
         } else {
-          alert("Payment initialization response: " + (data.message || "Endpoint returned without authorization URL"));
+          throw new Error(
+            data.message || "No payment authorization URL was returned."
+          );
         }
+
       } catch (err) {
         console.error("Checkout error:", err);
         alert("Payment Error: " + err.message);
+
       } finally {
-        if (payBtn) payBtn.innerHTML = `Pay Now ₦<span id="finalAmount">${totalAmount.toLocaleString()}</span>`;
+        if (payBtn) {
+          payBtn.disabled = false;
+          payBtn.innerHTML =
+            `Pay Now ₦<span id="finalAmount">${totalAmount.toLocaleString()}</span>`;
+        }
       }
     });
   }
@@ -601,16 +698,21 @@ async function loadBatchTrackerData() {
     }
 
     const result = await response.json();
+
     if (!result.success || !result.data) {
       throw new Error(result.message || "Invalid payload structure");
     }
 
     renderBatchCards(result.data, container);
+
   } catch (error) {
     console.error("Batch Telemetry Error:", error);
-    container.innerHTML = `<div style="text-align: center; grid-column: 1/-1; color: #e74c3c;">
-      <p>Unable to sync live inventory data right now. Please refresh.</p>
-    </div>`;
+
+    container.innerHTML = `
+      <div style="text-align: center; grid-column: 1/-1; color: #e74c3c;">
+        <p>Unable to sync live inventory data right now. Please refresh.</p>
+      </div>
+    `;
   }
 }
 
@@ -618,17 +720,24 @@ function renderBatchCards(batches, container) {
   container.innerHTML = '';
 
   if (batches.length === 0) {
-    container.innerHTML = `<p style="text-align: center; grid-column: 1/-1;">No active pond batches recorded yet.</p>`;
+    container.innerHTML = `
+      <p style="text-align: center; grid-column: 1/-1;">
+        No active pond batches recorded yet.
+      </p>
+    `;
     return;
   }
 
   batches.forEach(batch => {
-    const totalBiomassKg = ((batch.currentStockCount * batch.averageWeightGrams) / 1000).toFixed(1);
-    const mortalityRate = batch.initialStockCount > 0 
-      ? ((batch.mortalityCount / batch.initialStockCount) * 100).toFixed(1) 
+    const totalBiomassKg =
+      ((batch.currentStockCount * batch.averageWeightGrams) / 1000).toFixed(1);
+
+    const mortalityRate = batch.initialStockCount > 0
+      ? ((batch.mortalityCount / batch.initialStockCount) * 100).toFixed(1)
       : 0;
 
     const card = document.createElement('div');
+
     card.style.cssText = `
       background: #ffffff;
       border-radius: 10px;
@@ -667,22 +776,32 @@ async function verifyBatchCode() {
   if (!inputField || !resultContainer) return;
 
   const code = inputField.value.trim().toUpperCase();
+
   if (!code) {
-    resultContainer.innerHTML = `<p style="text-align: center; color: #e74c3c;">Please enter a batch code to verify.</p>`;
+    resultContainer.innerHTML = `
+      <p style="text-align: center; color: #e74c3c;">
+        Please enter a batch code to verify.
+      </p>
+    `;
     return;
   }
 
-  resultContainer.innerHTML = `<p style="text-align: center; color: #3498db;">Fetching traceability records for <b>${code}</b>...</p>`;
+  resultContainer.innerHTML = `
+    <p style="text-align: center; color: #3498db;">
+      Fetching traceability records for <b>${code}</b>...
+    </p>
+  `;
 
   try {
-    const response = await fetch(`${API_BASE_URL}/api/traceability/${code}`);
+    const response = await fetch(`${API_BASE_URL}/api/traceability/${encodeURIComponent(code)}`);
     const result = await response.json();
 
     if (!response.ok || !result.success) {
       resultContainer.innerHTML = `
         <div style="background: #fde8e8; color: #c81e1e; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #f8b4b4;">
           <b>Verification Failed:</b> ${result.message || 'No matching quality record found.'}
-        </div>`;
+        </div>
+      `;
       return;
     }
 
@@ -706,26 +825,29 @@ async function verifyBatchCode() {
           <div><b>Harvest Date:</b> ${harvest}</div>
           <div><b>Feed Grade:</b> ${data.feedTypeUsed}</div>
           <div><b>Harvest Biomass:</b> ${data.harvestWeightKg} kg</div>
-          <div><b>Water Quality:</b> <span style="color: #27ae60; font-weight: bold;">${data.waterQualityStatus}</span></div>
-          <div><b>Organic Certified:</b> ${data.organicCertified ? 'Yes ✅' : 'No ❌'}</div>
-          <div><b>Vet Inspection:</b> ${data.veterinaryInspectionPassed ? 'PASSED ✅' : 'FAILED ❌'}</div>
+          <div><b>Water Quality:</b> ${data.waterQualityStatus}</div>
+          <div><b>Organic Certified:</b> ${data.organicCertified ? 'Yes' : 'No'}</div>
+          <div><b>Vet Inspection:</b> ${data.veterinaryInspectionPassed ? 'PASSED' : 'NOT PASSED'}</div>
         </div>
 
         <div style="margin-top: 15px; background: #f8f9fa; padding: 12px; border-radius: 6px; font-size: 0.88rem; color: #555;">
-          <b>Quality Officer Notes:</b> ${data.notes}
+          <b>Quality Officer Notes:</b> ${data.notes || 'No additional notes.'}
         </div>
       </div>
     `;
+
   } catch (error) {
     console.error("Traceability verification error:", error);
+
     resultContainer.innerHTML = `
       <div style="background: #fde8e8; color: #c81e1e; padding: 15px; border-radius: 8px; text-align: center;">
         Unable to complete verification right now. Please check your backend connection.
-      </div>`;
+      </div>
+    `;
   }
 }
 
-// ===== 8. INTERACTIVE POND DIAGNOSTIC WIZARD (FRONTEND CONTROLLER) =====
+// ===== 8. INTERACTIVE POND DIAGNOSTIC WIZARD =====
 async function loadDiagnosticSymptoms() {
   const container = document.getElementById('symptoms-checkbox-grid');
   if (!container) return;
@@ -734,8 +856,12 @@ async function loadDiagnosticSymptoms() {
     const response = await fetch(`${API_BASE_URL}/api/diagnostic/symptoms`);
     const result = await response.json();
 
-    if (!response.ok || !result.success || result.data.length === 0) {
-      container.innerHTML = `<p style="color: #ef4444; grid-column: 1 / -1; text-align: center;">Unable to load diagnostic checklist options.</p>`;
+    if (!response.ok || !result.success || !result.data || result.data.length === 0) {
+      container.innerHTML = `
+        <p style="color: #ef4444; grid-column: 1 / -1; text-align: center;">
+          Unable to load diagnostic checklist options.
+        </p>
+      `;
       return;
     }
 
@@ -745,15 +871,22 @@ async function loadDiagnosticSymptoms() {
         <span style="font-size: 0.95rem; font-weight: 600; color: #1e293b;">${item.symptomName}</span>
       </label>
     `).join('');
+
   } catch (error) {
     console.error("Error loading symptoms:", error);
-    container.innerHTML = `<p style="color: #ef4444; grid-column: 1 / -1; text-align: center;">Error connecting to diagnostic service.</p>`;
+
+    container.innerHTML = `
+      <p style="color: #ef4444; grid-column: 1 / -1; text-align: center;">
+        Error connecting to diagnostic service.
+      </p>
+    `;
   }
 }
 
 async function runPondDiagnosis() {
   const reportContainer = document.getElementById('diagnostic-report-container');
   const btn = document.getElementById('run-diagnostic-btn');
+
   if (!reportContainer) return;
 
   const checkboxes = document.querySelectorAll('.diagnostic-symptom-checkbox:checked');
@@ -762,13 +895,19 @@ async function runPondDiagnosis() {
   if (selectedKeys.length === 0) {
     reportContainer.innerHTML = `
       <div style="background: #fef2f2; color: #991b1b; padding: 16px; border-radius: 10px; text-align: center; border: 1px solid #fecaca; font-weight: 600;">
-        ⚠️ Please check at least one symptom observed in your pond to generate an analysis.
-      </div>`;
+        Please check at least one symptom observed in your pond to generate an analysis.
+      </div>
+    `;
     return;
   }
 
-  if (btn) btn.textContent = "⌛ Analyzing Symptoms...";
-  reportContainer.innerHTML = `<p style="text-align: center; color: #2563eb; font-weight: 600;">Evaluating pond parameters and preparing diagnostic action report...</p>`;
+  if (btn) btn.textContent = "Analyzing Symptoms...";
+
+  reportContainer.innerHTML = `
+    <p style="text-align: center; color: #2563eb; font-weight: 600;">
+      Evaluating pond parameters and preparing analysis...
+    </p>
+  `;
 
   try {
     const response = await fetch(`${API_BASE_URL}/api/diagnostic/analyze`, {
@@ -783,7 +922,8 @@ async function runPondDiagnosis() {
       reportContainer.innerHTML = `
         <div style="background: #fef2f2; color: #991b1b; padding: 16px; border-radius: 10px; text-align: center; border: 1px solid #fecaca;">
           ${result.message || 'Diagnostic analysis failed.'}
-        </div>`;
+        </div>
+      `;
       return;
     }
 
@@ -807,7 +947,7 @@ async function runPondDiagnosis() {
       <div style="background: #ffffff; border: 2px solid ${borderColor}; border-radius: 12px; padding: 25px; box-shadow: 0 8px 25px rgba(0,0,0,0.06);">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 15px; margin-bottom: 20px;">
           <div>
-            <h3 style="margin: 0; color: #0f172a; font-size: 1.3rem;">📋 Diagnostic Report Summary</h3>
+            <h3 style="margin: 0; color: #0f172a; font-size: 1.3rem;">Diagnostic Report Summary</h3>
             <small style="color: #64748b;">Generated from Victory Farm Knowledge Base</small>
           </div>
           <span style="background: ${badgeBg}; color: ${badgeColor}; padding: 8px 16px; border-radius: 30px; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.5px;">
@@ -816,27 +956,35 @@ async function runPondDiagnosis() {
         </div>
 
         <div style="margin-bottom: 20px; background: #f8fafc; padding: 18px; border-radius: 10px;">
-          <h4 style="color: #1e293b; margin-top: 0; margin-bottom: 10px; font-size: 1.05rem;">⚠️ Potential Underlying Causes:</h4>
+          <h4 style="color: #1e293b; margin-top: 0; margin-bottom: 10px; font-size: 1.05rem;">Potential Underlying Causes:</h4>
           <ul style="margin: 0; padding-left: 20px; color: #334155; line-height: 1.6;">
             ${possibleCauses.map(c => `<li style="margin-bottom: 6px;"><b>${c}</b></li>`).join('')}
           </ul>
         </div>
 
         <div style="background: #f0fdf4; padding: 18px; border-radius: 10px; border: 1px solid #bbf7d0;">
-          <h4 style="color: #166534; margin-top: 0; margin-bottom: 10px; font-size: 1.05rem;">🛠️ Recommended Remedial Actions:</h4>
+          <h4 style="color: #166534; margin-top: 0; margin-bottom: 10px; font-size: 1.05rem;">Recommended Actions:</h4>
           <ul style="margin: 0; padding-left: 20px; color: #14532d; font-weight: 600; line-height: 1.6;">
             ${recommendedActions.map(a => `<li style="margin-bottom: 8px;">${a}</li>`).join('')}
           </ul>
         </div>
+
+        <p style="font-size: 0.85rem; color: #64748b; margin-top: 15px;">
+          This is an initial screening guide, not a veterinary diagnosis. Consult a qualified aquaculture professional for health concerns.
+        </p>
       </div>
     `;
+
   } catch (error) {
     console.error("Diagnostic execution error:", error);
+
     reportContainer.innerHTML = `
       <div style="background: #fef2f2; color: #991b1b; padding: 16px; border-radius: 10px; text-align: center;">
-        Unable to complete diagnosis. Check your network or server status.
-      </div>`;
+        Unable to complete analysis. Check your network or server status.
+      </div>
+    `;
+
   } finally {
-    if (btn) btn.textContent = "🔬 Analyze Symptoms & Generate Report";
+    if (btn) btn.textContent = "Analyze Symptoms & Generate Report";
   }
-}s
+}
