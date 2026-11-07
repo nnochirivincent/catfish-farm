@@ -607,17 +607,30 @@ function initCheckoutModal() {
       const phone = document.getElementById('customerPhone')?.value.trim();
       const deliveryArea = document.getElementById('customerArea')?.value;
       const deliveryAddress = document.getElementById('customerAddress')?.value.trim();
+         if (!name) {
+  alert("Customer name is missing.");
+  return;
+}
 
-      if (
-        !name ||
-        !email ||
-        !phone ||
-        !deliveryArea ||
-        !deliveryAddress
-      ) {
-        alert("Please complete all checkout fields, including your delivery address.");
-        return;
-      }
+if (!email) {
+  alert("Customer email is missing.");
+  return;
+}
+
+if (!phone) {
+  alert("Customer phone number is missing.");
+  return;
+}
+
+if (!deliveryArea) {
+  alert("Delivery area is missing.");
+  return;
+}
+
+if (!deliveryAddress) {
+  alert("Delivery address is missing.");
+  return;
+}
 
       const totalAmount =
         cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) + 2000;
