@@ -664,7 +664,7 @@ function initCheckoutModal() {
           body: JSON.stringify({
             email,
             amount: totalAmount,
-            customerName: name,
+            customerName,
             phone,
             deliveryArea,
             deliveryAddress,
