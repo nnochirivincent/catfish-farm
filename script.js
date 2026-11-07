@@ -542,7 +542,6 @@ function renderCartPage() {
   }
 }
 
-
 // ===== 7. CHECKOUT MODAL & PAYSTACK CONTROLS =====
 
 window.openCheckoutModal = function() {
@@ -593,6 +592,7 @@ function initCheckoutModal() {
     });
   }
 
+  // ===== UPDATED CHECKOUT FORM HANDLER =====
   const checkoutForm = document.getElementById('checkoutForm');
 
   if (checkoutForm) {
@@ -604,31 +604,59 @@ function initCheckoutModal() {
         return;
       }
 
-      const name = checkoutForm.querySelector('[name="customerName"]')?.value.trim();
-      const email = checkoutForm.querySelector('[name="customerEmail"]')?.value.trim();
-      const phone = checkoutForm.querySelector('[name="customerPhone"]')?.value.trim();
-      const areaField = checkoutForm.querySelector('[name="customerArea"]');
-      const addressField = checkoutForm.querySelector('[name="customerAddress"]');
+      // Find a checkout field by ID or name.
+      // Check the form first, then the whole document.
+      const getCheckoutField = (id, name) => {
+        return (
+          checkoutForm.querySelector(`#${id}`) ||
+          checkoutForm.querySelector(`[name="${name}"]`) ||
+          document.getElementById(id)
+        );
+      };
 
-      const deliveryArea = areaField?.value;
-      const deliveryAddress = addressField?.value.trim();
+      const nameField = getCheckoutField('customerName', 'customerName');
+      const emailField = getCheckoutField('customerEmail', 'customerEmail');
+      const phoneField = getCheckoutField('customerPhone', 'customerPhone');
+      const areaField = getCheckoutField('customerArea', 'customerArea');
+      const addressField = getCheckoutField('customerAddress', 'customerAddress');
 
+      const name = nameField?.value?.trim() || '';
+      const email = emailField?.value?.trim() || '';
+      const phone = phoneField?.value?.trim() || '';
+      const deliveryArea = areaField?.value?.trim() || '';
+      const deliveryAddress = addressField?.value?.trim() || '';
+
+      // Diagnostic information for troubleshooting
+      console.log("===== CHECKOUT DIAGNOSTICS =====");
       console.log("Checkout form found:", checkoutForm);
-      console.log("Delivery dropdown found:", areaField);
+      console.log("Name field found:", nameField);
+      console.log("Name value:", name);
+      console.log("Email field found:", emailField);
+      console.log("Email value:", email);
+      console.log("Phone field found:", phoneField);
+      console.log("Phone value:", phone);
+      console.log("Area field found:", areaField);
       console.log("Selected delivery area:", deliveryArea);
+      console.log("Address field found:", addressField);
+      console.log("Delivery address:", deliveryAddress);
+      console.log("Cart items:", cart);
 
-      if (!name) {
-        alert("Customer name is missing.");
+      // Validate customer information
+      if (!nameField || !name) {
+        alert("Customer name is missing. Please enter your full name.");
+        nameField?.focus();
         return;
       }
 
-      if (!email) {
-        alert("Customer email is missing.");
+      if (!emailField || !email) {
+        alert("Customer email is missing. Please enter your email address.");
+        emailField?.focus();
         return;
       }
 
-      if (!phone) {
-        alert("Customer phone number is missing.");
+      if (!phoneField || !phone) {
+        alert("Customer phone number is missing. Please enter your phone number.");
+        phoneField?.focus();
         return;
       }
 
@@ -639,28 +667,34 @@ function initCheckoutModal() {
 
       if (!deliveryArea) {
         alert("Please select your delivery area.");
+        areaField.focus();
         return;
       }
 
-      if (!deliveryAddress) {
-        alert("Delivery address is missing.");
+      if (!addressField || !deliveryAddress) {
+        alert("Please enter your full delivery address.");
+        addressField?.focus();
         return;
       }
 
       const totalAmount =
-        cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) + 2000;
+        cart.reduce((sum, item) => {
+          return sum + (Number(item.price) * Number(item.quantity));
+        }, 0) + 2000;
 
       const payBtn = document.getElementById('payNowBtn');
 
       try {
         if (payBtn) {
-          payBtn.textContent = "Processing...";
           payBtn.disabled = true;
+          payBtn.textContent = "Processing...";
         }
 
         const response = await fetch(`${API_BASE_URL}/api/payment/initialize`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json'
+          },
           body: JSON.stringify({
             email,
             amount: totalAmount,
@@ -672,9 +706,9 @@ function initCheckoutModal() {
           })
         });
 
-        const contentType = response.headers.get("content-type");
+        const contentType = response.headers.get("content-type") || '';
 
-        if (!contentType || !contentType.includes("application/json")) {
+        if (!contentType.includes("application/json")) {
           throw new Error(
             `Server payment route returned an unexpected response (${response.status}).`
           );
@@ -683,35 +717,34 @@ function initCheckoutModal() {
         const data = await response.json();
 
         if (!response.ok || !data.status) {
-          throw new Error(data.message || "Payment could not be initialized.");
+          throw new Error(
+            data.message || "Payment could not be initialized."
+          );
         }
 
-        const authUrl = data.data?.authorization_url;
+        const authorizationUrl = data.data?.authorization_url;
 
-        if (authUrl) {
-          window.location.href = authUrl;
-        } else {
+        if (!authorizationUrl) {
           throw new Error(
             data.message || "No payment authorization URL was returned."
           );
         }
 
-      } catch (err) {
-        console.error("Checkout error:", err);
-        alert("Payment Error: " + err.message);
+        // Redirect to Paystack only after receiving its authorization URL
+        window.location.href = authorizationUrl;
 
-      } finally {
+      } catch (error) {
+        console.error("Checkout payment error:", error);
+        alert("Payment Error: " + error.message);
+
         if (payBtn) {
           payBtn.disabled = false;
-          payBtn.innerHTML =
-            `Pay Now ₦<span id="finalAmount">${totalAmount.toLocaleString()}</span>`;
+          payBtn.textContent = "🔒 Pay with Paystack";
         }
       }
     });
   }
 }
-
-
 
 // ===== REAL-TIME BATCH & INVENTORY TRACKER =====
 async function loadBatchTrackerData() {
