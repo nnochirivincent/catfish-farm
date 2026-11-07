@@ -542,7 +542,9 @@ function renderCartPage() {
   }
 }
 
+
 // ===== 7. CHECKOUT MODAL & PAYSTACK CONTROLS =====
+
 window.openCheckoutModal = function() {
   if (cart.length === 0) {
     alert("Your cart is empty. Add items before checking out.");
@@ -602,37 +604,48 @@ function initCheckoutModal() {
         return;
       }
 
-      const name = document.getElementById('customerName')?.value.trim();
-      const email = document.getElementById('customerEmail')?.value.trim();
-      const phone = document.getElementById('customerPhone')?.value.trim();
-      const deliveryArea = document.getElementById('customerArea')?.value;
-      const deliveryAddress = document.getElementById('customerAddress')?.value.trim();
-      console.log("Selected delivery area:", document.getElementById('customerArea'));
-      console.log("Delivery area value:", document.getElementById('customerArea')?.value);
-         if (!name) {
-  alert("Customer name is missing.");
-  return;
-}
+      const name = checkoutForm.querySelector('[name="customerName"]')?.value.trim();
+      const email = checkoutForm.querySelector('[name="customerEmail"]')?.value.trim();
+      const phone = checkoutForm.querySelector('[name="customerPhone"]')?.value.trim();
+      const areaField = checkoutForm.querySelector('[name="customerArea"]');
+      const addressField = checkoutForm.querySelector('[name="customerAddress"]');
 
-if (!email) {
-  alert("Customer email is missing.");
-  return;
-}
+      const deliveryArea = areaField?.value;
+      const deliveryAddress = addressField?.value.trim();
 
-if (!phone) {
-  alert("Customer phone number is missing.");
-  return;
-}
+      console.log("Checkout form found:", checkoutForm);
+      console.log("Delivery dropdown found:", areaField);
+      console.log("Selected delivery area:", deliveryArea);
 
-if (!deliveryArea) {
-  alert("Delivery area is missing.");
-  return;
-}
+      if (!name) {
+        alert("Customer name is missing.");
+        return;
+      }
 
-if (!deliveryAddress) {
-  alert("Delivery address is missing.");
-  return;
-}
+      if (!email) {
+        alert("Customer email is missing.");
+        return;
+      }
+
+      if (!phone) {
+        alert("Customer phone number is missing.");
+        return;
+      }
+
+      if (!areaField) {
+        alert("Delivery area field could not be found. Please refresh the page.");
+        return;
+      }
+
+      if (!deliveryArea) {
+        alert("Please select your delivery area.");
+        return;
+      }
+
+      if (!deliveryAddress) {
+        alert("Delivery address is missing.");
+        return;
+      }
 
       const totalAmount =
         cart.reduce((sum, item) => sum + (item.price * item.quantity), 0) + 2000;
@@ -676,7 +689,6 @@ if (!deliveryAddress) {
         const authUrl = data.data?.authorization_url;
 
         if (authUrl) {
-          // Keep the cart until payment is verified.
           window.location.href = authUrl;
         } else {
           throw new Error(
@@ -698,6 +710,8 @@ if (!deliveryAddress) {
     });
   }
 }
+
+
 
 // ===== REAL-TIME BATCH & INVENTORY TRACKER =====
 async function loadBatchTrackerData() {
